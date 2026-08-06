@@ -13,8 +13,9 @@ P.sigma     = 0;            % Capital adjustment cost
 P.eps       = [0.02; 1.00; 1.17]/2.19;
 
 % Experiment
-P.experiment = 'baseline';  % 'baseline', 'nofriction' or 'frozen'
 P.freezeyear = 1965;        % Year the wedge is frozen at
+P.pad        = 20;          % Years appended after the sample so the terminal
+                            % bond condition binds outside the reported window
 
 % Solver settings
 P.tolprice  = 1e-13;        % Cost and price fixed point

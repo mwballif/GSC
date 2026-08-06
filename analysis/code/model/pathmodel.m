@@ -1,8 +1,10 @@
-function [res,out] = pathmodel(NX,omega,P,V,D,B)
+function [res,out] = pathmodel(NX,omega,P,V,D,B,S)
 
-% pathmodel: Steps 17 to 21 of model.pdf. 
+% pathmodel: Steps 17 to 21 of model.pdf.
 %
-% input:  NX is the guessed path of US net exports, omega the imposed wedge
+% input:  NX is the guessed path of US net exports, omega the imposed wedge.
+%         S is an optional set of year solutions from solveyears; pass it when
+%         only a few years have changed.
 % output: res is T residuals, out holds the solved path
 
 T = D.T;
@@ -13,17 +15,8 @@ NXall(V.ROW,:) = -NX(:)';
 %---------------------------------------------
 %   17. Every year
 %---------------------------------------------
-out.EC   = zeros(V.ncty,T);
-out.Y    = zeros(V.nsec,V.ncty,T);
-out.snew = zeros(V.nsec,V.ncty,T);
-out.wagehat = zeros(T,1);
-for t = 1:T
-    [wagehat,o] = solveyear(t,NX(t),P,V,D,B);
-    out.wagehat(t)  = wagehat;
-    out.EC(:,t)     = o.EC;
-    out.Y(:,:,t)    = o.Y;
-    out.snew(:,:,t) = o.snew;
-end
+if nargin < 7, S = solveyears(NX,P,V,D,B); end
+out = S;
 out.phitilde = 1./squeeze(sum(bsxfun(@times,P.eps,out.snew),1));
 
 %---------------------------------------------

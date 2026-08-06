@@ -42,11 +42,21 @@ MODEL
   baseline.m    steps 1-7,    what the data implies, including the wedge
   yearmodel.m   steps 9-15,   one year, given a guess of the US wage
   solveyear.m   step 8,       solves that guess
-  pathmodel.m   steps 17-21,  all years, given a path of US net exports
-  solvepath.m   steps 16, 22, Newton on that path
+  solveyears.m  step 17,      the static block, year by year
+  pathmodel.m   steps 18-21,  the intertemporal residuals
+  solvepath.m   steps 16, 22, Newton on the path of net exports
+  padyears.m    repeats the last year so the terminal condition binds
+                after the sample
+  vashares.m    US value added shares from a solved path
 
 Everything is in exact hat algebra, counterfactual over baseline. Step
 numbers match paper/ForwardSolve.tex.
+
+master.m runs four scenarios and compares them on the change in the US
+manufacturing value added share: the data, the friction frozen at its
+1965 value, the friction removed, and no trade imbalances at all. The
+wedge reaches real allocations only through net exports, so the last row
+brackets the whole channel.
 
   matlab -batch "run('analysis/code/model/master.m')"
 
