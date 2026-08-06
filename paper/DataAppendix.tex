@@ -1,0 +1,63 @@
+\documentclass{article}
+\usepackage{graphicx} % Required for inserting images
+\usepackage{amsmath}      % For equations
+\usepackage{amssymb}      % For mathematical symbols
+\usepackage{amsfonts} 
+\usepackage{geometry}% For mathematical fonts
+\geometry{margin=1in}
+
+\title{GSC}
+\author{Mitchell Ballif}
+\date{June 2026}
+
+\begin{document}
+
+\maketitle
+
+\section*{Data Appendix: Sectoral Prices}
+
+\subsection*{Data Sources}
+
+\textbf{Price Levels:} Productivity Level Database (PLD) 2005, Groningen Growth and Development Centre. Provides sectoral price levels relative to the United States (USA = 1.00) for benchmark year 2005.
+
+\textbf{Price Growth:} GGDC 10-Sector Database, Groningen Growth and Development Centre. Provides sectoral value-added deflators for 1950--2015.
+
+\subsection*{Sector Definitions}
+
+We aggregate the 10-sector ISIC classification to three broad sectors:
+\begin{itemize}
+    \item \textit{Agriculture}: GGDC sector AtB (Agriculture, hunting, forestry, and fishing)
+    \item \textit{Manufacturing}: GGDC sectors C, D, E (Mining, manufacturing, and utilities)
+    \item \textit{Services}: GGDC sectors F through P (Construction through other services)
+\end{itemize}
+
+\subsection*{Construction of Sectoral Prices}
+
+For each country $c$, sector $i$, and year $t$, we construct internationally comparable sectoral price levels as follows:
+
+\begin{enumerate}
+    \item Extract gross output price indices from GGDC Socioeconomic accounts: $\pi_{i,c,t}$ (originally base year 1995 or 2010 depending on release)
+    
+    \item Normalize price indices to 2005 base year within each country-sector:
+    \begin{equation}
+        \tilde{\pi}_{i,c,t} = \frac{\pi_{i,c,t}}{\pi_{i,c,2005}}
+    \end{equation}
+    where $\tilde{\pi}_{i,c,2005} = 1$ for all countries and sectors.
+    
+    \item Extract 2005 benchmark gross output PPP rates from PLD 2023: $\text{PPP}_{i,c}$ (local currency per USD). These are computed as geometric averages of detailed product-level PPPs, weighted by gross output shares within each broad sector.
+    
+    \item Extract nominal exchange rates from PWT: $e_{c,t}$ (local currency per USD in year $t$)
+    
+    \item Construct internationally comparable price levels:
+    \begin{equation}
+        P_{i,c,t} = \tilde{\pi}_{i,c,t} \cdot \frac{\text{PPP}_{i,c}}{e_{c,t}}
+    \end{equation}
+\end{enumerate}
+
+This procedure anchors each country-sector's price level to the 2005 PPP benchmark, then uses national accounts deflators to extrapolate forward and backward in time. The division by the nominal exchange rate converts to a common currency basis.
+
+The resulting price level $P_{i,c,t}$ is interpretable as follows: at the 2005 benchmark year, $P_{i,c,2005} = \text{PPP}_{i,c}/e_{c,2005}$ represents the sectoral gross output price level in country $c$ relative to the United States. In other years, $P_{i,c,t}$ incorporates both within-country price changes (via $\tilde{\pi}_{i,c,t}$) and exchange rate movements (via $e_{c,t}$). For the United States, $\text{PPP}_{i,\text{USA}} = e_{\text{USA},t} = 1$ by construction, so $P_{i,\text{USA},t} = \tilde{\pi}_{i,\text{USA},t}$, a pure within-country price index.
+
+
+\end{document}
+

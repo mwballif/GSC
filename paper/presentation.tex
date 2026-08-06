@@ -1,0 +1,279 @@
+\documentclass[10pt]{beamer}
+
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{booktabs}
+\usepackage{graphicx}
+
+\usetheme{default}
+\setbeamertemplate{navigation symbols}{}
+\setbeamertemplate{itemize items}[circle]
+\setlength{\abovedisplayskip}{4pt}
+\setlength{\belowdisplayskip}{4pt}
+
+% Placeholder frame: heading only, content to be added later
+\newcommand{\todoframe}[3]{%
+  \begin{frame}{#1}{#2}
+    \vfill
+    \centering \textit{#3}
+    \vfill
+  \end{frame}}
+
+\title{Title}
+\author{Mitchell Ballif}
+\date{\today}
+
+\begin{document}
+
+\begin{frame}
+  \titlepage
+\end{frame}
+
+%=======================================================
+\section{Introduction}
+%=======================================================
+
+\begin{frame}{Introduction}{The question}
+  \vfill
+  \begin{center}
+  \large
+  How much have financial frictions, working through changes in the trade
+  deficit, affected the process of structural transformation in the United
+  States?
+  \end{center}
+  \vfill
+  \centering \normalsize (sectoral value-added shares)
+  \vfill
+\end{frame}
+
+\todoframe{Introduction}{Motivation}{[TO ADD. Figure: U.S. manufacturing
+value-added share and the trade deficit, 1965--2014.]}
+
+\todoframe{Introduction}{What I do}{[TO ADD.]}
+
+\todoframe{Introduction}{Literature}{[TO ADD.]}
+
+%=======================================================
+\section{Results}
+%=======================================================
+
+\todoframe{Results}{Main result}{[TO ADD. Figure: manufacturing value-added share,
+baseline against counterfactual.]}
+
+
+
+
+%=======================================================
+\section{Model}
+%=======================================================
+
+\begin{frame}{Model}{Environment}
+  \begin{itemize}\itemsep8pt
+    \item Two countries $i\in\{US,ROW\}$, three sectors
+          $j\in\mathcal{J}=\{a,m,s\}$, years $t=1,\dots,T$.
+    \item All sectors tradable
+    \item Each country: a representative household that consumes, invests, and
+          trades one risk-free bond.
+    \item Disturbances: $\mu^j_{i,t}$ (tastes), $T^j_{i,t}$ (productivity),
+          $\tau^j_{ih,t}$ (trade costs), $\chi_{i,t}$ (investment efficiency),
+          $\phi_{i,t}$ (financial friction).
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Model}{Preferences}
+  Real consumption $C_{i,t}$ is defined implicitly by
+  \begin{align*}
+    \sum_{j \in \mathcal{J}}
+    \left(\mu^{j}_{i,t}\right)^{\frac{1}{\psi}}
+    \left(\frac{C_{i,t}}{L_{i,t}}\right)^{\frac{1-\psi}{\psi}\varepsilon^j}
+    \left(\frac{C^j_{i,t}}{L_{i,t}}\right)^{\frac{\psi-1}{\psi}} = 1,
+    \qquad \textstyle\sum_j \varepsilon^j = 1 .
+  \end{align*}
+  \vspace{2pt}
+  Nonhomothetic CES: $\psi$ substitutes across sectors, $\varepsilon^j$ is
+  sector $j$'s income elasticity. Homothetic iff all $\varepsilon^j$ equal.
+\end{frame}
+
+\begin{frame}{Model}{Consumption demand}
+  \begin{align*}
+    s^j_{i,t}
+    = \mu^j_{i,t}\left(\frac{P^j_{i,t}}{P^C_{i,t}}\right)^{1-\psi}
+      \left(\frac{C_{i,t}}{L_{i,t}}\right)^{(1-\psi)(\varepsilon^j-1)},
+    \qquad
+    E^C_{i,t} = P^C_{i,t}C_{i,t},
+  \end{align*}
+  \begin{align*}
+    P^C_{i,t} = \left[
+      \sum_{j \in \mathcal{J}} \mu^j_{i,t}
+      \left(\frac{C_{i,t}}{L_{i,t}}\right)^{(1-\psi)(\varepsilon^j-1)}
+      \left(P^j_{i,t}\right)^{1-\psi}\right]^{\frac{1}{1-\psi}} .
+  \end{align*}
+  \vspace{2pt}
+  Real consumption enters the shares: income growth alone reallocates spending.
+\end{frame}
+
+\begin{frame}{Model}{Investment and capital}
+  Homothetic CES with weights $\upsilon^j_i$ and elasticity $\zeta$. At $\zeta=1$,
+  \begin{align*}
+    x^j_{i,t} = \upsilon^j_i,
+    \qquad
+    P^X_{i,t} = \prod_j \left(P^j_{i,t}\right)^{\upsilon^j_i},
+    \qquad
+    E^X_{i,t} = P^X_{i,t}X_{i,t}.
+  \end{align*}
+  \begin{align*}
+    K_{i,t+1} = (1-d)K_{i,t}
+      + \chi_{i,t}\left(X_{i,t}\right)^{\sigma}\left(K_{i,t}\right)^{1-\sigma}.
+  \end{align*}
+  \vspace{2pt}
+  At $\sigma=0$: $K_{i,t+1}=K_{i,t}(1-d+\chi_{i,t})$, and investment is held at its
+  observed share of GDP.
+\end{frame}
+
+\begin{frame}{Model}{The household's dynamic problem}
+  $\max \sum_t \delta^t L_{i,t}\ln \bar{C}_{i,t}$, where
+  $\bar{C}_{i,t}\equiv C_{i,t}/L_{i,t}$, subject to
+  \begin{align*}
+    E^C_{i,t} + E^X_{i,t} + B_{i,t+1}
+    + \tfrac{\phi_{i,t}}{2}\left(B_{i,t+1}-\bar{B}_i\right)^2
+    &= w_{i,t}L_{i,t} + r_{i,t}K_{i,t} + R_{t}B_{i,t} + T_{i,t}.
+  \end{align*}
+  \begin{itemize}\itemsep6pt
+          shifter, replaced.
+    \item Cost rebated lump sum, so
+          $E^C_{i,t}=VA_{i,t}-E^X_{i,t}-NX_{i,t}$.
+    \item Bonds in zero net supply: $\sum_iB_{i,t}=0$,
+          $B_{i,t+1}=R_tB_{i,t}+NX_{i,t}$.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Model}{Euler Equation}
+  \begin{align*}
+    \underbrace{\frac{P^C_{i,t+1}\bar{C}_{i,t+1}}{P^C_{i,t}\bar{C}_{i,t}}}_{\text{expenditure growth}}
+    = \underbrace{\frac{\widetilde{\phi}_{i,t+1}}{\widetilde{\phi}_{i,t}}}_{\text{structural wedge}}
+      \cdot \underbrace{\delta}_{\text{discounting}}
+      \cdot \underbrace{\frac{R_{t+1}}{\omega_{i,t}}}_{\text{effective return}},
+  \end{align*}
+  \begin{align*}
+    \omega_{i,t} \equiv 1 + \phi_{i,t}\left(B_{i,t+1}-\bar{B}_i\right),
+    \qquad
+    \widetilde{\phi}_{i,t} \equiv \Big(\sum_j\varepsilon^js^j_{i,t}\Big)^{-1}.
+  \end{align*}
+  \vspace{2pt}
+  $\omega_{i,t}$ is the financial wedge
+\end{frame}
+
+\begin{frame}{Model}{Technology and unit costs}
+  Fr\'echet draws, scale $T^j_{i,t}$ and shape $\theta$:
+  \begin{align*}
+    q^j_{i,t}(\omega^j) = x^j_{i,t}(\omega^j)
+    \left[k^{\varphi_i}l^{1-\varphi_i}\right]^{\beta^j_i}
+    \left[\prod_{m\in\mathcal{J}}\left(D^{j,m}\right)^{\nu^{j,m}_i}\right]^{1-\beta^j_i}.
+  \end{align*}
+  Perfect competition, so the input bundle costs
+  \begin{align*}
+    c^j_{i,t} = \varkappa^j_i
+    \left(r_{i,t}^{\varphi_i}w_{i,t}^{1-\varphi_i}\right)^{\beta^j_i}
+    \left(\prod_{m\in\mathcal{J}}\left(P^m_{i,t}\right)^{\nu^{j,m}_i}\right)^{1-\beta^j_i}.
+  \end{align*}
+  \vspace{2pt}
+  $\beta^j_i$, $\varphi_i$, $\nu^{j,m}_i$ are time-invariant.
+\end{frame}
+
+\begin{frame}{Model}{Trade}
+  Iceberg costs $\tau^j_{ih,t}\geq1$, $\tau^j_{ii,t}=1$. Buyers source each variety
+  from the cheapest supplier:
+  \begin{align*}
+    P^j_{i,t} = \Gamma\left[\Phi^j_{i,t}\right]^{-\frac{1}{\theta}},
+    \qquad
+    \pi^j_{ih,t}
+    = \frac{T^j_{h,t}\left(c^j_{h,t}\tau^j_{ih,t}\right)^{-\theta}}{\Phi^j_{i,t}},
+    \qquad
+    \Phi^j_{i,t} = \sum_h T^j_{h,t}\left(c^j_{h,t}\tau^j_{ih,t}\right)^{-\theta}.
+  \end{align*}
+  \vspace{2pt}
+  $\pi^j_{ih,t}$: buyer first, seller second. Services trade too, at a common
+  $\theta$.
+\end{frame}
+
+\begin{frame}{Model}{Market clearing}
+  \begin{align*}
+    E^j_{i,t} = s^j_{i,t}E^C_{i,t} + \upsilon^j_i E^X_{i,t}
+    + \sum_{m\in\mathcal{J}} \nu^{m,j}_i\left(1-\beta^m_i\right)Y^m_{i,t},
+    \quad
+    Y^j_{i,t} = \sum_h \pi^j_{hi,t}E^j_{h,t}.
+  \end{align*}
+  \begin{align*}
+    VA_{i,t} = \sum_j \beta^j_i Y^j_{i,t},
+    \qquad
+    w_{i,t}L_{i,t} = (1-\varphi_i)VA_{i,t},
+    \qquad
+    r_{i,t}K_{i,t} = \varphi_i VA_{i,t},
+  \end{align*}
+  \begin{align*}
+    NX^j_{i,t} = Y^j_{i,t}-E^j_{i,t},
+    \qquad
+    \sum_i NX_{i,t}=0.
+  \end{align*}
+\end{frame}
+
+\begin{frame}{Model}{Equilibrium}
+  Given parameters, $K_{i,1}$, $B_{i,1}=0$, and paths for
+  $\{\mu^j_{i,t},T^j_{i,t},\tau^j_{ih,t},\chi_{i,t},\phi_{i,t}\}$, an equilibrium
+  is paths of prices, quantities, trade shares and bonds such that
+  \begin{enumerate}\itemsep6pt
+    \item households optimize: demand, the saving equation, the law of motion;
+    \item firms minimize cost and price equals delivered cost;
+    \item prices and trade shares satisfy gravity;
+    \item goods and factor markets clear;
+    \item bonds are in zero net supply.
+  \end{enumerate}
+  \vspace{6pt}
+
+\end{frame}
+
+\begin{frame}{Model}{Calibration}
+  \begin{center}
+  \begin{tabular}{llc}
+    \toprule
+    $\theta$   & trade elasticity              & 4 \\
+    $\eta$     & elasticity across varieties   & 2 \\
+    $\psi$     & elasticity across sectors     & 0.57 \\
+    $\zeta$    & investment elasticity         & 1 \\
+    $\sigma$   & capital adjustment            & 0 \\
+    $\delta$   & discount factor               & 0.95 \\
+    $d$        & depreciation                  & 0.05 \\
+    \bottomrule
+  \end{tabular}
+  \end{center}
+  \vspace{8pt}
+  $\varepsilon^j$ from Comin, Lashkari and Mestieri (2021); $\varphi_i$ from
+  Caselli and Feyrer (2007); $\beta^j_i$ and $\nu^{j,m}_i$ are sample averages.
+\end{frame}
+
+%=======================================================
+\section{Recovering parameters}
+%=======================================================
+
+\begin{frame}{Recovering parameters}{Two steps}
+  \vfill
+  \begin{enumerate}\itemsep12pt
+    \item \textbf{Invert.} Solve the equilibrium conditions backwards for the
+          disturbances that reproduce the data exactly. 
+    \item \textbf{Freeze one disturbance and re-solve forward.} 
+          unknowns.
+  \end{enumerate}
+
+\end{frame}
+
+
+
+%=======================================================
+\section{Counterfactuals}
+%=======================================================
+
+\todoframe{Counterfactuals}{[TO ADD.]}
+
+\todoframe{Conclusion}{}{[TO ADD.]}
+
+\end{document}
