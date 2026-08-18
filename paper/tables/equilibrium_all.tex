@@ -1,0 +1,26 @@
+% Save this file as: tables/equilibrium_all.tex
+\begin{tabular}{p{0.5cm} p{7.0cm} p{2.0cm}}
+\toprule
+\textbf{Tag} & \textbf{Equation / Recovery Formula} & \textbf{Description} \\
+\midrule
+(C1) & $\displaystyle P^C_{i,t} \equiv \left[\sum_j \mu^j_{i,t}\left(\frac{C_{i,t}}{L_{i,t}}\right)^{(1-\psi)(\varepsilon^j-1)}(P^j_{i,t})^{1-\psi}\right]^{\frac{1}{1-\psi}}$ & Consumption price index \\
+
+(X1) & $\displaystyle P^X_{i,t} \equiv \left[\sum_{j} \upsilon^j_{i}(P^j_{i,t})^{1-\zeta}\right]^{\frac{1}{1-\zeta}}$ & Investment price index \\
+
+(F1) & $\displaystyle c^j_{i,t} = \kappa^j_i \left[(r_{i,t}^{\varphi_i} w_{i,t}^{1-\varphi_i})^{\beta^j_i} \prod_m (P^m_{i,t})^{\nu^{j,m}_i}\right]$ & Sectoral unit cost \\
+
+(T1) & $\displaystyle \pi^j_{ih,t} = \frac{T^j_{h,t}(c^j_{h,t}\tau^j_{ih,t})^{-\theta}}{\Phi^j_{i,t}}$ & Trade share (Gravity) \\
+
+(E1) & $\displaystyle \frac{E^C_{i,t+1}}{E^C_{i,t}} = \frac{L_{i,t+1}}{L_{i,t}}\frac{\widetilde{\phi}_{i,t+1}}{\widetilde{\phi}_{i,t}}\frac{\delta R_{t+1}}{1+\phi_{i,t}(B_{i,t+1}-\bar{B}_i)}$ & Bond Euler equation \\
+
+(K1) & $\displaystyle \frac{R_{t+1}}{1+\phi_{i,t}(B_{i,t+1}-\bar{B}_i)} P^X_{i,t} = \frac{\xi_{i,t}}{\xi_{i,t+1}}\left[r_{i,t+1} + (1-d)P^X_{i,t+1}\right]$ & Capital Euler ($\sigma=1$) \\
+\midrule
+(INV1) & $\displaystyle T^j_{i,t} = \pi^j_{ii,t}\left(\Gamma\,\frac{c^j_{i,t}}{P^j_{i,t}}\right)^{\theta}$ & Productivity inversion \\
+
+(INV2) & $\displaystyle \tau^j_{ih,t} = \frac{P^j_{i,t}}{P^j_{h,t}} \left(\frac{\pi^j_{hh,t}}{\pi^j_{ih,t}}\right)^{\frac{1}{\theta}}$ & Trade cost inversion \\
+
+(INV3) & $\displaystyle \phi_{R,t} = \frac{1}{B_{R,t+1}-\bar{B}_{R}} \left[ \frac{E^C_{R,t}}{E^C_{R,t+1}}\frac{L_{R,t+1}}{L_{R,t}}\frac{\widetilde{\phi}_{R,t+1}}{\widetilde{\phi}_{R,t}}\delta R_{t+1} - 1 \right]$ & Financial friction inversion \\
+
+(INV4) & $\displaystyle \frac{\xi_{i,t}}{\xi_{i,t+1}} = R_{t+1}P^X_{i,t}\Big/\left[1+\phi_{i,t}(B_{i,t+1}-\bar{B}_i)\right]\left[r_{i,t+1}+(1-d)P^X_{i,t+1}\right]$ & Capital wedge inversion \\
+\bottomrule
+\end{tabular}

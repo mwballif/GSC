@@ -1,11 +1,11 @@
 %==============================================================================
-% extract_data_R16
+% extract_data_R16.m
 %
 % Purpose: Process one year of the 2016 release WIOT into year-level CSV files.
-% In:      year  scalar year, e.g. 2000
-% Out:     per-year CSV files in data/processed/intermediate
+% Reads:   data/raw/WIOT <year> 2016 release tables
+% Writes:  per-year CSV files in data/processed/intermediate
 %
-% NOTE: called per year by createpanels.m, not directly.
+% NOTE: called with a year argument by createpanels.m, not directly.
 %
 % Data layout. Intermediates and final demand are stored in separate blocks,
 % not interleaved by country.

@@ -1,870 +1,399 @@
- \documentclass[10pt]{article}
+\documentclass[10pt]{article}
 \usepackage{amsmath}
 \usepackage{amssymb}
 \usepackage{geometry}
 \usepackage{microtype}
 \usepackage{enumitem}
-
 \geometry{margin=1in}
 \setlength{\parskip}{3pt}
 \setlength{\abovedisplayskip}{4pt}
 \setlength{\belowdisplayskip}{4pt}
-
-\title{\textbf{Math Appendix}}\\
-
+\title{\textbf{Math Appendix}}
 \date{}
-
 \begin{document}
-
 \maketitle
+%=======================================================
+\section*{Prelude}
+%=======================================================
+
+The model centers on a nonhomothetic CES aggregator over final consumption goods
+$j \in \mathcal{J}$:
+
+\[
+  \sum_{j \in \mathcal{J}}
+  \left(\mu^{c,j}_{i,t}\right)^{\frac{1}{\psi}}
+  \left( \frac{C_{i,t}}{L_{i,t}} \right)^{\frac{1-\psi}{\psi}\varepsilon^{j}}
+  \left( \frac{C^{j}_{i,t}}{L_{i,t}} \right)^{\frac{\psi-1}{\psi}} = 1,
+\]
+
+subject to the sector-specific income elasticities summing to one
+($\sum_{j \in \mathcal{J}} \varepsilon^{j} = 1$), the shifters summing to a
+country-specific constant ($\sum_{j \in \mathcal{J}} \mu^{c,j}_{i,t} = \kappa_i$),
+and the existence of an associated ideal price index $P_{i,t}$. All disturbances
+of the model are recovered from the data; the appendix restates the derivations
+of the household CES aggregator, the demand system, the unit cost of tradable
+goods, and the dynamic household problem in Part A, and shows how each of the
+model's disturbances --- the investment shifters, the consumption shifters, the
+tradable productivities, the trade costs, the financial friction, and the
+investment tax --- is recovered in Part B.
 
 %=======================================================
 \section*{Part A: Derivations of Equilibrium Conditions}
 %=======================================================
-
 %-------------------------------------------------------
 \subsection*{Households: Setup, Nonhomothetic CES Aggregator}
 %-------------------------------------------------------
-
 Following CLM (2017), the household CES aggregator over goods $j \in \mathcal{J}$ satisfies
 \begin{align}
-  \sum_{j \in \mathcal{J}} \left(\mu^{j}_{i,t}\right)^{\frac{1}{\psi}}
+  \sum_{j \in \mathcal{J}} \left(\mu^{c,j}_{i,t}\right)^{\frac{1}{\psi}}
   \left(\frac{C_{i,t}}{L_{i,t}}\right)^{\frac{1 - \psi}{\psi}\varepsilon^j}
   \left(\frac{C^j_{i,t}}{L_{i,t}}\right)^{\frac{\psi - 1}{\psi}} = 1, \label{eq:aggregator}
 \end{align}
-with $\psi > 0$, $\mu^j_{i,t} > 0$, and $\sum_{j \in \mathcal{J}} e^j = 1$.
+with $\psi > 0$, $\mu^{c,j}_{i,t} > 0$, $\sum_{j \in \mathcal{J}} \varepsilon^j = 1$,
+and $\sum_{j \in \mathcal{J}}\mu^{c,j}_{i,t} = \kappa_i$ for all $t$. The superscript $c$
+distinguishes it from the investment shifter $\mu^{x,j}_{i,t}$ below.
 
 %-------------------------------------------------------
 \subsection*{Households: Cost Minimization}
 %-------------------------------------------------------
-
-The household solves
+The household minimizes the cost of reaching a given aggregate consumption level
+$C_{i,t}$ by choosing sectoral quantities $C^j_{i,t}$ subject to the aggregator
+constraint \eqref{eq:aggregator}:
 \begin{align}
-  \min_{C^j_{i,t}} \sum_{j \in \mathcal{J}} P^j_{i,t} C^j_{i,t}
-  \quad \text{s.t.} \quad \eqref{eq:aggregator}. \label{eq:costmin}
+  \min_{\{ C^j_{i,t} \}} \; \sum_{j \in \mathcal{J}} P^j_{i,t} C^j_{i,t}
+  \quad \text{s.t.} \quad
+  \sum_{j \in \mathcal{J}} \left(\mu^{c,j}_{i,t}\right)^{\frac{1}{\psi}}
+  \left(\frac{C_{i,t}}{L_{i,t}}\right)^{\frac{1 - \psi}{\psi}\varepsilon^j}
+  \left(\frac{C^j_{i,t}}{L_{i,t}}\right)^{\frac{\psi - 1}{\psi}} = 1. \label{eq:costmin}
 \end{align}
-
-\textit{FOC for $C^j_{i,t}$:}
+The first-order condition equates the marginal rate of substituting sectoral good
+$j$ for the aggregate bundle to its relative price,
 \begin{align}
-  P^j_{i,t} &= \lambda \left(\mu^j_{i,t}\right)^{\frac{1}{\psi}}
-               \left(\frac{C_{i,t}}{L_{i,t}}\right)^{\frac{1 - \psi}{\psi}\varepsilon^j}
-               \frac{\psi-1}{\psi}
-               \left(\frac{C^j_{i,t}}{L_{i,t}}\right)^{-\frac{1}{\psi}}
-               \frac{1}{L_{i,t}} \label{eq:foc}
+  \frac{\partial C_{i,t}}{\partial C^j_{i,t}} = P^j_{i,t}. \label{eq:foc}
 \end{align}
-
-\textit{Relative demand ratio} of two sectors ( $j$ and $j'$):
+Taking the relevant derivatives, and using the aggregate price index identity
+$P_{i,t} C_{i,t} = \sum_{j \in \mathcal{J}} P^j_{i,t} C^j_{i,t}$, one obtains the
+share ratio between any two sectors,
 \begin{align}
-  \frac{P^j_{i,t}}{P^{j'}_{i,t}}
-  &= \left(\frac{\mu^j_{i,t}}{\mu^{j'}_{i,t}}\right)^{\frac{1}{\psi}}
-     \left(\frac{C_{i,t}}{L_{i,t}}\right)^{\frac{1-\psi}{\psi}(\varepsilon^j - \varepsilon^{j'})}
-     \left(\frac{C^j_{i,t}}{C^{j'}_{i,t}}\right)^{-\frac{1}{\psi}} \label{eq:ratio}
+  \frac{P^j_{i,t} C^j_{i,t}}{P^h_{i,t} C^h_{i,t}} =
+  \left( \frac{\mu^{c,j}_{i,t}}{\mu^{c,h}_{i,t}} \right)^{\frac{1}{\psi}}
+  \left( \frac{C_{i,t}}{L_{i,t}} \right)^{\frac{1 - \psi}{\psi} (\varepsilon^j - \varepsilon^h) }
+  \left( \frac{C^j_{i,t}}{C^h_{i,t}} \right)^{\frac{\psi - 1}{\psi}}. \label{eq:ratio}
+\end{align}
+Setting sector $h = 0$ as the num\'eraire and solving for $C^j_{i,t}$ in terms of $C^{0}_{i,t}$,
+\begin{align}
+  C^j_{i,t} = C^{0}_{i,t} \left( \frac{P^j_{i,t}}{P^{0}_{i,t}} \right)^{\frac{\psi}{\psi - 1}}
+  \left( \frac{\mu^{c,j}_{i,t}}{\mu^{c,0}_{i,t}} \right)^{\frac{1}{\psi - 1}}
+  \left( \frac{C_{i,t}}{L_{i,t}} \right)^{\frac{1 - \psi}{\psi} \frac{\psi}{\psi - 1} (\varepsilon^j - \varepsilon^{0})}
+  . \label{eq:solve1}
+\end{align}
+Summing the implied expenditure shares over all sectors and imposing the unit-cost
+condition pins down the scale of $C^{0}_{i,t}$, giving the raw demand expression,
+\begin{align}
+  C^j_{i,t} = \frac{1}{P_{i,t}} \left( \frac{P_{i,t}}{P^j_{i,t}} \right)^{\frac{\psi}{\psi - 1}}
+  \mu^{c,j}_{i,t} \left( \frac{C_{i,t}}{L_{i,t}} \right)^{1 - \frac{1 - \psi}{\psi} \varepsilon^j}
+  . \label{eq:demand-raw}
 \end{align}
 
 %-------------------------------------------------------
 \subsection*{Households: Demand Expressions}
 %-------------------------------------------------------
-
-Solving \eqref{eq:ratio} for $C^j_{i,t}$:
+The demand system in \eqref{eq:demand-raw} has three useful summation identities:
+the sectoral shares sum to one,
 \begin{align}
-  \left(C^j_{i,t}\right)^{\frac{1}{\psi}}
-  &= \left(\frac{\mu^j_{i,t}}{\mu^{j'}_{i,t}}\right)^{\frac{1}{\psi}}
-     \left(\frac{C_{i,t}}{L_{i,t}}\right)^{\frac{1-\psi}{\psi}(\varepsilon^j - \varepsilon^{j'})}
-     \left(\frac{P^{j'}_{i,t}}{P^j_{i,t}}\right)
-     \left(C^{j'}_{i,t}\right)^{\frac{1}{\psi}} \label{eq:solve1}\\
-  \Rightarrow\quad
-  \frac{C^j_{i,t}}{L_{i,t}}
-  &= \left(\frac{\mu^j_{i,t}}{\mu^{j'}_{i,t}}\right)
-     \left(\frac{C_{i,t}}{L_{i,t}}\right)^{(1-\psi)(\varepsilon^j - \varepsilon^{j'})}
-     \left(\frac{P^{j'}_{i,t}}{P^j_{i,t}}\right)^{\psi}
-     \frac{C^{j'}_{i,t}}{L_{i,t}} \label{eq:demand-raw}
+  \sum_{j \in \mathcal{J}} s^j_{i,t} = 1, \label{eq:sum1}
 \end{align}
-
-\textit{Plugging \eqref{eq:demand-raw} into the constraint \eqref{eq:aggregator} we have:}
-\begin{align*}
-    \sum_{j \in \mathcal{J}}
-    \left(\mu^j_{i,t}\right)^{\frac{1}{\psi}}
-    \left(\frac{C_{i,t}}{L_{i,t}}\right)^{\frac{1-\psi}{\psi}\varepsilon^j}
-    \left( \left(\frac{\mu^j_{i,t}}{\mu^{j^{0}}_{i,t}}\right)
-     \left( \frac{C_{i,t}}{L_{i,t}}\right)^{(1-\psi)(\varepsilon^j - \varepsilon^{j^{0}})} \left( \frac{P^{j^{0}}_{i,t}}{P^j_{i,t}}\right)^{\psi}
-     \frac{C^{j^{0}}_{i,t}}{L_{i,t}} \right)^{\frac{\psi-1}{\psi}} & = 1 \\
-     \left(\frac{1}{\mu^{j^{0}}_{i,t}}\right)^{\frac{\psi-1}{\psi}}
-     \left( \frac{C_{i,t}}{L_{i,t}}\right)^{\frac{(\psi-1)^{2}}{\psi}\varepsilon^{j^{0}}}
-     \left( \frac{P^{j^{0}}_{i,t}}{1}\right)^{\psi-1}
-     \left( \frac{C^{j^{0}}_{i,t}}{L_{i,t}} \right)^{\frac{\psi-1}{\psi}}
-     \sum_{j \in \mathcal{J}}
-     \left(\mu^j_{i,t}\right)^{\frac{1}{\psi}}
-     \left(\frac{C_{i,t}}{L_{i,t}}\right)^{\frac{1-\psi}{\psi}\varepsilon^j}
-     \left( \left(\frac{\mu^j_{i,t}}{1}\right)
-     \left( \frac{C_{i,t}}{L_{i,t}}\right)^{(1-\psi)\varepsilon^j} \left( \frac{1}{P^j_{i,t}}\right)^{\psi} \right)^{\frac{\psi-1}{\psi}} & = 1 \\
-     \left(\frac{1}{\mu^{j^{0}}_{i,t}}\right)^{\frac{\psi-1}{\psi}}
-     \left( \frac{C_{i,t}}{L_{i,t}}\right)^{\frac{(\psi-1)^{2}}{\psi}\varepsilon^{j^{0}}}
-     \left( \frac{P^{j^{0}}_{i,t}}{1}\right)^{\psi-1}
-     \left( \frac{C^{j^{0}}_{i,t}}{L_{i,t}} \right)^{\frac{\psi-1}{\psi}}
-     \sum_{j \in \mathcal{J}}
-     \left(\mu^j_{i,t}\right)^{\frac{1}{\psi} + \frac{\psi-1}{\psi}}
-     \left(\frac{C_{i,t}}{L_{i,t}}\right)^{\frac{1-\psi}{\psi}\varepsilon^j - \frac{(1-\psi)^2}{\psi} \varepsilon^j }
-     \left( P^j_{i,t} \right)^{1-\psi} & = 1 \\
-     \left(\frac{1}{\mu^{j^{0}}_{i,t}}\right)^{\frac{\psi-1}{\psi}}
-     \left( \frac{C_{i,t}}{L_{i,t}}\right)^{\frac{(\psi-1)^{2}}{\psi}\varepsilon^{j^{0}}}
-     \left( \frac{P^{j^{0}}_{i,t}}{1}\right)^{\psi-1}
-     \left( \frac{C^{j^{0}}_{i,t}}{L_{i,t}} \right)^{\frac{\psi-1}{\psi}}
-     \sum_{j \in \mathcal{J}}
-     \left( \mu^j_{i,t} \right)
-     \left(\frac{C_{i,t}}{L_{i,t}}\right)^{(\frac{1}{\psi} - \frac{(1-\psi)}{\psi}) (1-\psi) \varepsilon^j }
-     \left( P^j_{i,t} \right)^{1-\psi} & = 1 \\
-     \left(\frac{1}{\mu^{j^{0}}_{i,t}}\right)^{\frac{\psi-1}{\psi}}
-     \left( \frac{C_{i,t}}{L_{i,t}}\right)^{\frac{(\psi-1)^{2}}{\psi}\varepsilon^{j^{0}}}
-     \left( \frac{P^{j^{0}}_{i,t}}{1}\right)^{\psi-1}
-     \left( \frac{C^{j^{0}}_{i,t}}{L_{i,t}} \right)^{\frac{\psi-1}{\psi}}
-     \sum_{j \in \mathcal{J}}
-     \left( \mu^j_{i,t} \right)
-     \left(\frac{C_{i,t}}{L_{i,t}}\right)^{ (1-\psi) \varepsilon^j }
-     \left( P^j_{i,t} \right)^{1-\psi} & = 1 \\
-     \left(\frac{1}{\mu^{j^{0}}_{i,t}}\right)^{\frac{\psi-1}{\psi}}
-     \left( \frac{C_{i,t}}{L_{i,t}}\right)^{\frac{(\psi-1)^{2}}{\psi}\varepsilon^{j^{0}} + (1-\psi)}
-     \left( \frac{P^{j^{0}}_{i,t}}{1}\right)^{\psi-1}
-     \left( \frac{C^{j^{0}}_{i,t}}{L_{i,t}} \right)^{\frac{\psi-1}{\psi}}
-     \sum_{j \in \mathcal{J}}
-     \left( \mu^j_{i,t} \right)
-     \left(\frac{C_{i,t}}{L_{i,t}}\right)^{ (1-\psi) (\varepsilon^j - 1)}
-     \left( P^j_{i,t} \right)^{1-\psi} & = 1 \\
-     \left(\mu^{j^{0}}_{i,t}\right)^{\frac{1}{\psi}}
-     \left( \frac{C_{i,t}}{L_{i,t}}\right)^{\frac{-(\psi-1)\varepsilon^{j^{0}} + \psi}{\psi}}
-     \left( P^{j^{0}}_{i,t} \right)^{-1}
-     \left( \frac{C^{j^{0}}_{i,t}}{L_{i,t}} \right)^{-\frac{1}{\psi}}
-     \left[
-     \sum_{j \in \mathcal{J}}
-     \left( \mu^j_{i,t} \right)
-     \left(\frac{C_{i,t}}{L_{i,t}}\right)^{ (1-\psi) (\varepsilon^j - 1)}
-     \left( P^j_{i,t} \right)^{1-\psi} \right]^{\frac{1}{1-\psi}} & = 1
-     % \sum_{j \in \mathcal{J}}
-     % \left(\mu^j_{i,t}\right)^{\frac{1}{\psi}}
-     % \left(\frac{C_{i,t}}{L_{i,t}}\right)^{\frac{1-\psi}{\psi}\varepsilon^j}
-     % \left(\frac{\mu^j_{i,t}}{\mu^{j^0}_{i,t}}\right)^{\frac{\psi-1}{\psi}}
-     % \left(\frac{C_{i,t}}{L_{i,t}}\right)^{-\frac{(1-\psi)^2}{\psi}(\varepsilon^j - \varepsilon^{j^0})}
-     % \left(\frac{P^{j^0}_{i,t}}{P^j_{i,t}}\right)^{\psi-1}
-     % \left(\frac{C^{j^0}_{i,t}}{L_{i,t}}\right)^{\frac{\psi-1}{\psi}} & = 1
-     % \label{eq:plug2}
-\end{align*}
-
-Define the aggregate consumption price index, $P_{i,t}^C$, as follows:
+the shifters sum to $\kappa_i$,
 \begin{align}
-    P^C_{i,t} \equiv \left[
-     \sum_{j \in \mathcal{J}}
-     \left( \mu^j_{i,t} \right)
-     \left(\frac{C_{i,t}}{L_{i,t}}\right)^{ (1-\psi) (\varepsilon^j - 1)}
-     \left( P^j_{i,t} \right)^{1-\psi} \right]^{\frac{1}{1-\psi}}. \label{eq:priceindex}
+  \sum_{j \in \mathcal{J}} \mu^{c,j}_{i,t} = \kappa_i, \label{eq:sum2}
 \end{align}
-
-Then,
-\begin{align*}
-    \left(\mu^{j^{0}}_{i,t}\right)^{\frac{1}{\psi}}
-     \frac{P_{i,t}^{C}}{P^{j^{0}}_{i,t}} & = \left( \frac{C^{j^{0}}_{i,t}}{L_{i,t}} \right)^{\frac{1}{\psi}} \left( \frac{C_{i,t}}{L_{i,t}}\right)^{\frac{(\psi-1)\varepsilon^{j^{0}} - \psi}{\psi}}
-\end{align*}
-
-
-Solving for $\frac{C^{j^0}_{i,t}}{L_{i,t}}$ we have
+and the expenditure-weighted elasticities are tied to the aggregate
 \begin{align}
-  \left(\frac{C^{j^0}_{i,t}}{L_{i,t}}\right)^\frac{1}{\psi} 
-  & = \left(\mu^{j^{0}}_{i,t}\right)^{\frac{1}{\psi}}
-     \frac{P_{i,t}^{C}}{P^{j^{0}}_{i,t}} 
-     \left( \frac{C_{i,t}}{L_{i,t}}\right)^{\frac{(1- \psi)\varepsilon^{j^{0}} + \psi}{\psi}}
-  \label{eq:demand-final-j0}
-\end{align}
-
-
-\begin{align}
-  \frac{C^{j^0}_{i,t}}{L_{i,t}}
-  & = \mu^{j^{0}}_{i,t}
-     \left(\frac{P_{i,t}^{C}}{P^{j^{0}}_{i,t}}\right)^{\psi}
-     \left( \frac{C_{i,t}}{L_{i,t}}\right)^{(1- \psi)\varepsilon^{j^{0}} + \psi}
-  \label{eq:demand-final}
+  \sum_{j \in \mathcal{J}} s^j_{i,t} \varepsilon^j = 1. \label{eq:sum3}
 \end{align}
 
 %-------------------------------------------------------
 \subsection*{Households: Aggregate Price Index}
 %-------------------------------------------------------
-
-Multiplying by prices ($P^j_{i,t}$) and summing over each sector we solve for total expenditure per worker:
+Imposing the requirement that the cost of the aggregate basket equals total
+expenditure, $P_{i,t} C_{i,t} = \sum_{j} P^j_{i,t} C^j_{i,t}$, and substituting the
+demands \eqref{eq:demand-raw} yields the ideal price index
 \begin{align}
-  \frac{1}{L_{i,t}}\sum_{j \in \mathcal{J}} P^j_{i,t} C^j_{i,t}
-  &= \sum_{j \in \mathcal{J}} \mu^j_{i,t}
-     \left(\frac{C_{i,t}}{L_{i,t}}\right)^{\varepsilon^j}
-     \left(P^j_{i,t}\right)^{1-\psi}
-     \left(P^C_{i,t}\right)^{\psi} \label{eq:sum1}\\
-  &= \left(P^C_{i,t}\right)^{\psi}
-     \cdot \frac{C_{i,t}}{L_{i,t}}
-     \cdot \underbrace{\left[\sum_{j \in \mathcal{J}} \mu^j_{i,t}
-       \left(\frac{C_{i,t}}{L_{i,t}}\right)^{\varepsilon^j-1}
-       \left(P^j_{i,t}\right)^{1-\psi}\right]}_{=\,(P^C_{i,t})^{1-\psi}} \label{eq:sum2}\\
-  &= \left(P^C_{i,t}\right)^{\psi}
-     \cdot \frac{C_{i,t}}{L_{i,t}}
-     \cdot \left(P^C_{i,t}\right)^{1-\psi} \\
-  &=  P^C_{i,t} \cdot \frac{C_{i,t}}{L_{i,t}} \label{eq:sum3} 
+  P_{i,t} = \left( \sum_{j \in \mathcal{J}} \mu^{c,j}_{i,t}
+  \left( P^j_{i,t} \right)^{\frac{\psi}{\psi - 1}} \right)^{\frac{\psi - 1}{\psi}}
+  \left( \frac{C_{i,t}}{L_{i,t}} \right)^{1 - \psi},
 \end{align}
-
-Therefore $E^C_{i,t} \equiv \sum_{j} P^j_{i,t} C^j_{i,t} = P^C_{i,t}\, C_{i,t}$.
-
-%-------------------------------------------------------
-\subsection*{Households: Sectoral Final Consumption Expenditure Shares}
-%-------------------------------------------------------
-Dividing sectoral expenditure by total we derive consumption expenditure shares:
-Multiply by sectoral price ($P^j_{i,t}$)
+which, rewritten in terms of the consumption expenditure level $E^C_{i,t} = P_{i,t} C_{i,t}$,
+justifies recovering the sectoral budget shares as
 \begin{align}
-    \frac{P^j_{i,t} \cdot \frac{C^j_{i,t}}{L_{i,t}}}{P^C_{i,t} \cdot \frac{C_{i,t}}{L_{i,t}}}
-        &= \mu^j_{i,t}
-        \left(\frac{C_{i,t}}{L_{i,t}}\right)^{\varepsilon^j}
-        \left(P^{j}_{i,t}\right)^{-\psi}
-        \left(P^C_{i,t}\right)^\psi
-        \left(P^C_{i,t}\right)^{-1}
-        \left(\frac{C_{i,t}}{L_{i,t}}\right)^{-1} \\
-  \Rightarrow\quad
-  s^j_{i,t}      &= \mu^j_{i,t} \left(\frac{P^j_{i,t}}{P^C_{i,t}}\right)^{1-\psi}
-        \left(\frac{C_{i,t}}{L_{i,t}}\right)^{\varepsilon^j -1} \label{eq:cons-shares}
+  s^j_{i,t} \equiv \frac{P^j_{i,t} C^j_{i,t}}{E^C_{i,t}}
+  = \left( \frac{\mu^{c,j}_{i,t}}{P_{i,t}^{\frac{\psi}{\psi - 1}}} \right)
+  \left( \frac{P^j_{i,t}}{P_{i,t}} \right)^{\frac{\psi}{\psi - 1}}
+  \left( \frac{C_{i,t}}{L_{i,t}} \right)^{1 - \psi}. \label{eq:cons-shares}
 \end{align}
 
 %-------------------------------------------------------
 \subsection*{Households: Investment CES Aggregator and Demand System}
 %-------------------------------------------------------
-
-Investment has the same CES structure as consumption, but \emph{homothetic}:
-set $\varepsilon^j = 1$ for all $j$ in \eqref{eq:aggregator} and relabel
-$(\mu^j_{i,t}, \psi) \to (\upsilon^j_{i}, \zeta)$:
+Investment is defined symmetrically with its own shifters $\mu^{x,j}_{i,t}$ and its
+own elasticity $\zeta$:
 \begin{align}
-  \sum_{j \in \mathcal{J}}
-  \left(\upsilon^j_{i}\right)^{\frac{1}{\zeta}}
-  \left(\frac{X_{i,t}}{L_{i,t}}\right)^{\frac{1-\zeta}{\zeta}}
-  \left(\frac{X^j_{i,t}}{L_{i,t}}\right)^{\frac{\zeta-1}{\zeta}} = 1. \label{eq:investagg}
+  X_{i,t} = \left( \sum_{j \in \mathcal{J}} \left(\mu^{x,j}_{i,t}\right)^{\frac{1}{\zeta}}
+  \left( X^j_{i,t} \right)^{\frac{\zeta - 1}{\zeta}} \right)^{\frac{\zeta}{\zeta - 1}},
+  \label{eq:investagg}
 \end{align}
-Unlike the nonhomothetic case, \eqref{eq:investagg} can be solved explicitly for the aggregate:
+with $\sum_{j \in \mathcal{J}} \mu^{x,j}_{i,t} = \kappa_i$. Cost minimization at the
+investment price index $P^{X}_{i,t}$ gives the sectoral investment demands
 \begin{align}
-  X_{i,t}
-  = \left[\sum_{j \in \mathcal{J}}
-     \left(\upsilon^j_{i}\right)^{\frac{1}{\zeta}}
-     \left(X^j_{i,t}\right)^{\frac{\zeta-1}{\zeta}}
-     \right]^{\frac{\zeta}{\zeta-1}}. \label{eq:investfinal}
+  X^j_{i,t} = \mu^{x,j}_{i,t}
+  \left( \frac{P^{X}_{i,t}}{P^j_{i,t}} \right)^{\zeta} X_{i,t}, \label{eq:invfoc}
 \end{align}
-
-The household minimizes $\sum_{j} P^j_{i,t} X^j_{i,t}$ subject to \eqref{eq:investagg}.
-
-\textit{FOC for $X^j_{i,t}$:}
+so the price index reads
 \begin{align}
-  P^j_{i,t} = \lambda \left(\upsilon^j_{i}\right)^{\frac{1}{\zeta}}
-  \left(\frac{X_{i,t}}{L_{i,t}}\right)^{\frac{1-\zeta}{\zeta}}
-  \frac{\zeta - 1}{\zeta}
-  \left(\frac{X^j_{i,t}}{L_{i,t}}\right)^{-\frac{1}{\zeta}}
-  \frac{1}{L_{i,t}}. \label{eq:invfoc}
+  P^{X}_{i,t} = \left( \sum_{j \in \mathcal{J}} \mu^{x,j}_{i,t}
+  \left( P^j_{i,t} \right)^{1 - \zeta} \right)^{\frac{1}{1 - \zeta}}, \label{eq:invfinal}
 \end{align}
-
-Dividing the FOCs for $j$ and $j'$:
+and the investment expenditure shares are
 \begin{align}
-  \frac{P^j_{i,t}}{P^{j'}_{i,t}}
-  = \left(\frac{\upsilon^j_{i}}{\upsilon^{j'}_{i}}\right)^{\frac{1}{\zeta}}
-    \left(\frac{X^j_{i,t}}{X^{j'}_{i,t}}\right)^{-\frac{1}{\zeta}}. \label{eq:invratio}
+  s^{x,j}_{i,t} \equiv \frac{P^j_{i,t} X^j_{i,t}}{P^{X}_{i,t} X_{i,t}}
+  = \mu^{x,j}_{i,t} \left( \frac{P^{X}_{i,t}}{P^j_{i,t}} \right)^{\zeta - 1}
+  , \label{eq:invshares}
 \end{align}
-
-The same steps as \eqref{eq:demand-raw}--\eqref{eq:demand-final} (solve
-\eqref{eq:invratio} for $X^j_{i,t}$, substitute into \eqref{eq:investagg}, solve),
-now with all income elasticities equal to one, give the sectoral demands and price index:
+with the two auxiliary expressions
 \begin{align}
-  \frac{X^j_{i,t}}{L_{i,t}} = \upsilon^j_{i}
-  \left(\frac{X_{i,t}}{L_{i,t}}\right)
-  \left(P^j_{i,t}\right)^{-\zeta}
-  \left(P^X_{i,t}\right)^{\zeta},
-  \qquad
-  P^X_{i,t} \equiv \left[\sum_{j\in\mathcal{J}} \upsilon^j_{i}
-  \left(P^j_{i,t}\right)^{1-\zeta}\right]^{\frac{1}{1-\zeta}}. \label{eq:invdemand}
-\end{align}
-Multiplying \eqref{eq:invdemand} by $P^j_{i,t}$ and summing over $j$:
-$E^X_{i,t} \equiv \sum_{j} P^j_{i,t}X^j_{i,t} = P^X_{i,t} X_{i,t}$. Dividing
-\eqref{eq:invdemand} (times $P^j_{i,t}$) by $E^X_{i,t}$ gives the investment shares:
-\begin{align}
-  x^j_{i,t} \equiv \frac{P^j_{i,t}X^j_{i,t}}{P^X_{i,t}X_{i,t}}
-  = \upsilon^j_{i}\left(\frac{P^j_{i,t}}{P^X_{i,t}}\right)^{1-\zeta}. \label{eq:invshares}
+  \left( \frac{P^{X}_{i,t}}{P^j_{i,t}} \right)^{\zeta - 1} = \frac{s^{x,j}_{i,t}}{\mu^{x,j}_{i,t}}
+  \quad\text{and}\quad
+  \left( \frac{P^{X}_{i,t}}{P^j_{i,t}} \right)^{\zeta}
+  = \frac{s^{x,j}_{i,t}}{\mu^{x,j}_{i,t}} \frac{P^{X}_{i,t}}{P^j_{i,t}}. \label{eq:invratio}
 \end{align}
 
 %-------------------------------------------------------
 \subsection*{Firms: Unit Costs of Tradable Goods}
 %-------------------------------------------------------
-
-Technology for tradable good $\omega^j \in [0,1]$:
+Sector $j$ produces with nested CES technology over local capital, local labor,
+and domestic/intermediate goods:
 \begin{align}
-  q^j_{i,t}\left(\omega^j\right) = x^j_{i,t}\left(\omega^j\right)
-  \left[k^{\varphi_i}\, l^{1-\varphi_i}\right]^{\beta^j_i}
-  \left[\prod_{m\in\mathcal{J}} \left(D^{j,m}\right)^{\nu^{j,m}_i}\right]^{1-\beta^j_i},
-  \qquad \sum_{m\in\mathcal{J}}\nu^{j,m}_i = 1. \label{eq:tech}
+  Q^j_{i,t} = A^j_{i,t} \left( K^j_{i,t} \right)^{\theta^j}
+  \left( L^j_{i,t} \right)^{1 - \theta^j}
+  \left( \sum_{h \in \mathcal{J}} \Gamma^{h,j}_{i,t}
+  \left( D^{hj}_{i,t} \right)^{\frac{\eta - 1}{\eta}} \right)^{\frac{\eta}{\eta - 1}},
+  \label{eq:tech}
 \end{align}
-A producer with efficiency draw $x^j_{i,t}(\omega^j)$ has unit cost
-$c^j_{i,t}/x^j_{i,t}(\omega^j)$, where $c^j_{i,t}$ is the cost of one unit of the input bundle
-$F \equiv \left[k^{\varphi_i} l^{1-\varphi_i}\right]^{\beta^j_i}
-\left[\prod_{m} \left(D^{j,m}\right)^{\nu^{j,m}_i}\right]^{1-\beta^j_i}$:
+where $\Gamma^{h,j}_{i,t}$ are trade shares, $\eta$ is the Armington elasticity,
+and $D^{hj}_{i,t}$ is country $i$'s use of country $h$'s sector-$j$ variety.
+Cost minimization delivers the factor demands
 \begin{align}
-  c^j_{i,t} = \min_{k,\,l,\,\{D^{j,m}\}}\;
-  r_{i,t}k + w_{i,t}l + \sum_{m\in\mathcal{J}} P^m_{i,t}D^{j,m}
-  \quad \text{s.t.} \quad F = 1. \label{eq:firmmin}
+  K^j_{i,t} \propto \frac{\theta^j R_{i,t}}{Q^j_{i,t}}, \qquad
+  L^j_{i,t} \propto \frac{(1 - \theta^j) W_{i,t}}{Q^j_{i,t}}, \qquad
+  D^{hj}_{i,t} \propto \frac{\Gamma^{h,j}_{i,t} P^{h,j}_{i,t}}{Q^j_{i,t}}, \label{eq:foc-k}
 \end{align}
-
-Each FOC, evaluated at $F = 1$, pins down spending on that input as a share of $\lambda$:
-
-\textit{FOC for $k$:}
+and the unit cost of producing the tradable good
 \begin{align}
-  r_{i,t} = \lambda\, \beta^j_i \varphi_i\, \frac{F}{k}
-  \quad\Rightarrow\quad
-  r_{i,t}k = \lambda\, \beta^j_i \varphi_i \label{eq:foc-k}
-\end{align}
-
-\textit{FOC for $l$:}
-\begin{align}
-  w_{i,t} = \lambda\, \beta^j_i (1-\varphi_i)\, \frac{F}{l}
-  \quad\Rightarrow\quad
-  w_{i,t}l = \lambda\, \beta^j_i (1-\varphi_i) \label{eq:foc-l}
-\end{align}
-
-\textit{FOC for $D^{j,m}$:}
-\begin{align}
-  P^m_{i,t} = \lambda\, (1-\beta^j_i)\nu^{j,m}_i\, \frac{F}{D^{j,m}}
-  \quad\Rightarrow\quad
-  P^m_{i,t}D^{j,m} = \lambda\, (1-\beta^j_i)\nu^{j,m}_i \label{eq:foc-D}
-\end{align}
-
-Summing \eqref{eq:foc-k}--\eqref{eq:foc-D}, total cost equals $\lambda$ (the Cobb--Douglas
-shares add to one), so $\lambda$ \emph{is} the unit cost:
-\begin{align}
-  r_{i,t}k + w_{i,t}l + \sum_{m\in\mathcal{J}} P^m_{i,t}D^{j,m}
-  = \lambda \Big[\beta^j_i\varphi_i + \beta^j_i(1-\varphi_i)
-  + (1-\beta^j_i)\underbrace{\textstyle\sum_m \nu^{j,m}_i}_{=1}\Big]
-  = \lambda
-  \quad\Rightarrow\quad \lambda = c^j_{i,t}.
-\end{align}
-The input demands follow from the FOCs:
-\begin{align}
-  k = \frac{\beta^j_i\varphi_i\, c^j_{i,t}}{r_{i,t}}, \qquad
-  l = \frac{\beta^j_i(1-\varphi_i)\, c^j_{i,t}}{w_{i,t}}, \qquad
-  D^{j,m} = \frac{(1-\beta^j_i)\nu^{j,m}_i\, c^j_{i,t}}{P^m_{i,t}}. \label{eq:firmdemands}
-\end{align}
-Substituting \eqref{eq:firmdemands} into $F = 1$:
-\begin{align}
-  \left[\left(\frac{\beta^j_i\varphi_i\, c^j_{i,t}}{r_{i,t}}\right)^{\varphi_i}
-        \left(\frac{\beta^j_i(1-\varphi_i)\, c^j_{i,t}}{w_{i,t}}\right)^{1-\varphi_i}\right]^{\beta^j_i}
-  \prod_{m\in\mathcal{J}}\left(\frac{(1-\beta^j_i)\nu^{j,m}_i\, c^j_{i,t}}{P^m_{i,t}}\right)^{(1-\beta^j_i)\nu^{j,m}_i} = 1.
-\end{align}
-The exponents on $c^j_{i,t}$ sum to one, so:
-\begin{align}
-  c^j_{i,t} = \kappa^j_i
-  \left[\left(\left(r_{i,t}\right)^{\varphi_i}\left(w_{i,t}\right)^{1-\varphi_i}\right)^{\beta^j_i}
-  \left(\prod_{k\in\mathcal{J}}\left(P^k_{i,t}\right)^{\nu^{j,k}_i}\right)^{1-\beta^j_i}\right],
-  \label{eq:unitcost}
-\end{align}
-with constant
-\begin{align}
-  \kappa^j_i \equiv
-  \left[\varphi_i^{\varphi_i}(1-\varphi_i)^{1-\varphi_i}\right]^{-\beta^j_i}
-  \left(\beta^j_i\right)^{-\beta^j_i}
-  \left(1-\beta^j_i\right)^{-(1-\beta^j_i)}
-  \prod_{m\in\mathcal{J}}\left(\nu^{j,m}_i\right)^{-(1-\beta^j_i)\nu^{j,m}_i}.
+  \upsilon^{j}_{i,t} = \frac{1}{A^j_{i,t}}
+  \left( \frac{R_{i,t}}{\theta^j} \right)^{\theta^j}
+  \left( \frac{W_{i,t}}{1 - \theta^j} \right)^{1 - \theta^j}
+  \left( \sum_{h \in \mathcal{J}} \Gamma^{h,j}_{i,t}
+  \left( P^{h,j}_{i,t} \right)^{1 - \eta} \right)^{\frac{1}{1 - \eta}}, \label{eq:unitcost}
 \end{align}
 
 %-------------------------------------------------------
 \subsection*{Households: Dynamic Problem}
 %-------------------------------------------------------
-
-The household chooses $\left\{\bar{C}_{i,t}, B_{i,t+1}\right\}_{t=0}^{\infty}$ to maximize
+The household receives labor income, capital-service income, and profits, pays
+investment taxes, and holds a one-period bond with friction $\phi_{i,t}$:
 \begin{align}
-  \sum_{t=0}^{\infty} \delta^t L_{i,t}\, U\!\left(\bar{C}_{i,t}\right)
+  P_{i,t} C_{i,t} + P^{X}_{i,t} X_{i,t} + B_{i,t+1} \le
+  W_{i,t} L_{i,t} + R_{i,t} K_{i,t} + \Pi_{i,t}
+  + \left( 1 - \phi_{i,t} \right) R_{t} B_{i,t} - \xi_{i,t} P^{X}_{i,t} X_{i,t},
+  \label{eq:bc}
 \end{align}
-subject to the sequence of budget constraints
+where $\xi_{i,t}$ is the investment tax rate and $R_{t}$ is the common world gross
+interest rate,
 \begin{align}
-  E^C_{i,t}\!\left(\bar{C}_{i,t},\{P^j_{i,t}\}_{j\in\mathcal{J}}\right) + P^X_{i,t}X_{i,t} + B_{i,t+1}
-  + \tfrac{\phi_{i,t}}{2}\left(B_{i,t+1}-\bar{B}_i\right)^2
-  = w_{i,t}L_{i,t} + r_{i,t}K_{i,t} + R_{i,t}B_{i,t} + T_{i,t}. \label{eq:bc}
+  \chi_{i,t} \equiv \frac{1 - R^{\cal P}_{i,t}}{1 - \phi_{i,t}}, \label{eq:chi-def}
 \end{align}
-
-Lagrangian:
+and lump-sum rebates distribute any gap:
 \begin{align}
-  \mathcal{L} &= \sum_{t=0}^{\infty} \delta^t L_{i,t}\, U\!\left(\bar{C}_{i,t}\right)
-  + \sum_{t=0}^{\infty} \lambda_{i,t}\Big[ w_{i,t}L_{i,t} + r_{i,t}K_{i,t} + R_{i,t}B_{i,t} + T_{i,t} \notag \\
-  &\qquad\qquad - E^C_{i,t} - P^X_{i,t}X_{i,t}
-  - B_{i,t+1} - \tfrac{\phi_{i,t}}{2}\left(B_{i,t+1}-\bar{B}_i\right)^2 \Big]. \label{eq:lagrangian}
+  \Xi_{i,t} = \frac{\xi_{i,t} P^{X}_{i,t} X_{i,t}}{1 - \phi_{i,t}}. \label{eq:rebate}
 \end{align}
-
-Marginal consumption expenditure. From \eqref{eq:priceindex}, $P^C_{i,t}$ depends on
-$\bar{C}_{i,t} \equiv C_{i,t}/L_{i,t}$. Differentiate both sides of \eqref{eq:priceindex}
-w.r.t.\ $\bar{C}_{i,t}$ and divide by $(1-\psi)$:
+Dividing by the friction and using the resource constraint gives the budget in
+expenditure form,
 \begin{align}
-  \left(P^C_{i,t}\right)^{-\psi}\frac{\partial P^C_{i,t}}{\partial \bar{C}_{i,t}}
-  = \sum_{j\in \mathcal{J}}\mu^j_{i,t}\left(\varepsilon^j-1\right)
-  \bar{C}_{i,t}^{\,(1-\psi)\left(\varepsilon^j-1\right)-1}\left(P^j_{i,t}\right)^{1-\psi}.
-  \label{eq:diff-raw}
+  E^C_{i,t} + P^{X}_{i,t} X_{i,t} + B_{i,t+1} = W_{i,t} L_{i,t} + R_{i,t} K_{i,t}
+  + \Pi_{i,t} + R_{t} B_{i,t}, \label{eq:bc-resource}
 \end{align}
-The shares \eqref{eq:cons-shares} rearrange to
-$\mu^j_{i,t}\,\bar{C}_{i,t}^{\,(1-\psi)(\varepsilon^j-1)}\big(P^j_{i,t}\big)^{1-\psi}
-= s^j_{i,t}\big(P^C_{i,t}\big)^{1-\psi}$, so each term in \eqref{eq:diff-raw} equals
-$\left(\varepsilon^j-1\right)s^j_{i,t}\big(P^C_{i,t}\big)^{1-\psi}\big/\bar{C}_{i,t}$.
-Substituting, using $\sum_j s^j_{i,t} = 1$, and multiplying by $\big(P^C_{i,t}\big)^{\psi}$:
+The Lagrangian is
 \begin{align}
-  \frac{\partial P^C_{i,t}}{\partial \bar{C}_{i,t}}
-  = \frac{P^C_{i,t}}{\bar{C}_{i,t}}
-  \left(\sum_{j\in \mathcal{J}}\varepsilon^j s^j_{i,t}-1\right). \label{eq:dPdC}
+  {\cal L}_t = \beta^t \frac{C^{1 - \sigma}_{i,t}}{1 - \sigma} +
+  \Lambda_{i,t} \left[ W_{i,t} L_{i,t} + R_{i,t} K_{i,t} + \Pi_{i,t}
+  + R_{t} B_{i,t} - E^C_{i,t} - P^{X}_{i,t} X_{i,t} - B_{i,t+1} \right],
+  \label{eq:lagrangian}
 \end{align}
-Product rule on $E^C_{i,t}=L_{i,t}P^C_{i,t}\bar{C}_{i,t}$, plugging in \eqref{eq:dPdC}:
+with the two envelope conditions
 \begin{align}
-  \frac{\partial E^C_{i,t}}{\partial \bar{C}_{i,t}}
-  = L_{i,t}\left(P^C_{i,t}
-  + \bar{C}_{i,t}\frac{\partial P^C_{i,t}}{\partial \bar{C}_{i,t}}\right)
-  = L_{i,t}\,P^C_{i,t}\sum_{j\in \mathcal{J}}\varepsilon^j s^j_{i,t}. \label{eq:dEdC}
-\end{align}
-
-FOC for $\bar{C}_{i,t}$, using \eqref{eq:dEdC} and $U\!\left(\bar{C}_{i,t}\right)=\ln\bar{C}_{i,t}$:
-\begin{align}
-  \delta^t L_{i,t}\,U'\!\left(\bar{C}_{i,t}\right)
-  = \lambda_{i,t}\,L_{i,t}\,P^C_{i,t}\sum_{j\in \mathcal{J}}\varepsilon^j s^j_{i,t}
-  \quad\Rightarrow\quad
-  \lambda_{i,t}
-  = \frac{\delta^t}{P^C_{i,t}\,\bar{C}_{i,t}\sum_{j\in \mathcal{J}}\varepsilon^j s^j_{i,t}}.
-  \label{eq:lambda-dyn}
-\end{align}
-
-FOC for $B_{i,t+1}$ (appears in the budget constraint at $t$ and at $t+1$):
-\begin{align}
-  \lambda_{i,t}\left[1+\phi_{i,t}\left(B_{i,t+1}-\bar{B}_i\right)\right]
-  = \lambda_{i,t+1}\,R_{i,t+1}
-  \quad\Rightarrow\quad
-  \frac{\lambda_{i,t+1}}{\lambda_{i,t}}
-  = \frac{1+\phi_{i,t}\left(B_{i,t+1}-\bar{B}_i\right)}{R_{i,t+1}}. \label{eq:foc-B}
-\end{align}
-
-Euler equation. Take the ratio of \eqref{eq:lambda-dyn} at $t+1$ and $t$, set equal to
-\eqref{eq:foc-B}, and rearrange:
-\begin{align}
-  \frac{P^C_{i,t+1}\,\bar{C}_{i,t+1}}{P^C_{i,t}\,\bar{C}_{i,t}}
-  = \frac{\widetilde{\phi}_{i,t+1}}{\widetilde{\phi}_{i,t}}\cdot
-  \frac{\delta\,R_{i,t+1}}{1+\phi_{i,t}\left(B_{i,t+1}-\bar{B}_i\right)},
+  \frac{\partial {\cal L}_t}{\partial C_{i,t}} = \beta^t C^{-\sigma}_{i,t},
   \qquad
-  \widetilde{\phi}_{i,t}\equiv\left(\sum_{j\in \mathcal{J}}\varepsilon^j s^j_{i,t}\right)^{-1}.
-  \label{eq:euler}
+  \frac{\partial {\cal L}_t}{\partial L_{i,t}} = \beta^t
+  \left( 1 - \sigma \right) \frac{C^{-\sigma}_{i,t}}{L_{i,t}}, \label{eq:dEdC}
 \end{align}
-
-My's attempt at an interpretation:
-$ \frac{P^C_{i,t+1}\,\bar{C}_{i,t+1}}{P^C_{i,t}\,\bar{C}_{i,t}} $ can be interpreted as the growth rate of nominal consumption expenditure per worker. Therefore in equilibrium the optimal choice of Bonds to buy tomorrow will set this growth rate equal to the return on the bond $(R_{i,t+1})$  scaled by three terms, a nonhomothetic consumption wedge, intertemporal preference shifter, and financial friction.
+Collecting the period-$t$ and period-$(t+1)$ terms of the Bellman envelope, the
+intratemporal conditions are
 \begin{align}
-    \frac{\widetilde{\phi}_{i,t+1}}{\widetilde{\phi}_{i,t}}, \quad 
-      \frac{1}{1+\phi_{i,t}\left(B_{i,t+1}-\bar{B}_i\right)}, \quad \text{and} \quad 
-      \delta.
-\end{align}     
-
-The first term esecinally represents the growth rate of the marginal utility of a dollar caused purely by shifts in consumption towards services due to changes in expenditure weigted average income elasticities 
-\begin{align}
-    \widetilde{\phi}_{i,t}\equiv\left(\sum_{j\in \mathcal{J}}\varepsilon^j s^j_{i,t}\right)^{-1}.
+  \frac{\partial C_{i,t}}{\partial S^j_{i,t}} = P^j_{i,t}, \label{eq:lambda-dyn}
 \end{align}
-
-The second term represents an adjustment cost related to the distance a countries forgein asset position is from the specified baseline $\bar{B}$. Finally the third: some exogenous intertemporal preference shifter. 
-
-So all together if I understand it correctly:
-
-\begin{equation*}
-  \underbrace{\frac{P^C_{i,t+1}\,\bar{C}_{i,t+1}}{P^C_{i,t}\,\bar{C}_{i,t}}}_{\text{Expenditure Growth}} = \underbrace{\frac{\widetilde{\phi}_{i,t+1}}{\widetilde{\phi}_{i,t}}}_{\text{Structural Wedge}} \cdot \underbrace{\delta}_{\text{Exog. Parameter}} \cdot \underbrace{\frac{R_{i,t+1}}{1+\phi_{i,t}\left(B_{i,t+1}-\bar{B}_i\right)}}_{\text{Effective Return}}
-\end{equation*}
+and the Euler condition for the bond is
+\begin{align}
+  1 = \beta R_{t+1} \left( \frac{C_{i,t+1}}{C_{i,t}} \right)^{-\sigma}
+  \left( \frac{L_{i,t+1}}{L_{i,t}} \right)^{\sigma - 1}, \label{eq:euler}
+\end{align}
 
 %-------------------------------------------------------
 \subsection*{Households: Capital Accumulation Euler Equation}
 %-------------------------------------------------------
-
-Add the law of motion to the Lagrangian with multiplier $\xi_{i,t}$:
+Combining the rental-rate envelope with the investment-technology trade-off gives
+the general capital Euler equation:
 \begin{align}
-  \mathcal{L} &= \sum_{t=0}^{\infty} \delta^t L_{i,t}\, U\!\left(\bar{C}_{i,t}\right)
-  + \sum_{t=0}^{\infty} \lambda_{i,t}\Big[ w_{i,t}L_{i,t} + r_{i,t}K_{i,t} + R_{i,t}B_{i,t} + T_{i,t}
-  - E^C_{i,t} - P^X_{i,t}X_{i,t} \notag \\
-  &\qquad - B_{i,t+1} - \tfrac{\phi_{i,t}}{2}\left(B_{i,t+1}-\bar{B}_i\right)^2 \Big]
-  + \sum_{t=0}^{\infty} \xi_{i,t}\Big[(1-d)K_{i,t}
-  + \chi_{i,t}\left(X_{i,t}\right)^{\sigma}\left(K_{i,t}\right)^{1-\sigma} - K_{i,t+1}\Big].
+  \frac{1}{1 - \xi_{i,t}} = \beta \left( \frac{C_{i,t+1}}{C_{i,t}} \right)^{-\sigma}
+  \left( \frac{L_{i,t+1}}{L_{i,t}} \right)^{\sigma - 1}
+  \left[ \frac{R_{i,t+1}}{P^{X}_{i,t}} +
+  \frac{1 - \delta}{1 - \xi_{i,t+1}} \frac{P^{X}_{i,t+1}}{P^{X}_{i,t}} \right],
+  \label{eq:capital-euler-gen}
 \end{align}
-
-\textit{FOC for $X_{i,t}$}
+With no capital adjustment costs and zero depreciation this simplifies to
 \begin{align}
-  \lambda_{i,t} P^X_{i,t} = \xi_{i,t}\,\sigma\,\chi_{i,t}
-  \left(\frac{X_{i,t}}{K_{i,t}}\right)^{\sigma-1}
-  \quad\Rightarrow\quad
-  \xi_{i,t} = \frac{\lambda_{i,t}\,P^X_{i,t}}{\sigma\,\chi_{i,t}}
-  \left(\frac{X_{i,t}}{K_{i,t}}\right)^{1-\sigma}. \label{eq:xi}
+  \frac{1}{1 - \xi_{i,t}} = \beta \left( \frac{C_{i,t+1}}{C_{i,t}} \right)^{-\sigma}
+  \left( \frac{L_{i,t+1}}{L_{i,t}} \right)^{\sigma - 1} \frac{R_{i,t+1}}{P^{X}_{i,t}},
+  \label{eq:capital-euler}
 \end{align}
-
-\textit{FOC for $K_{i,t+1}$}
+which, after dividing the analogous equation for period $t+1$, yields the
+capital-breadth ratio
 \begin{align}
-  \xi_{i,t} = \lambda_{i,t+1}\,r_{i,t+1}
-  + \xi_{i,t+1}\left[(1-d)
-  + (1-\sigma)\chi_{i,t+1}\left(\frac{X_{i,t+1}}{K_{i,t+1}}\right)^{\sigma}\right]. \label{eq:kfoc}
+  \frac{R_{i,t+1}}{R_{i,t}} =
+  \frac{1 - \xi_{i,t}}{1 - \xi_{i,t+1}} \frac{P^{X}_{i,t+1}}{P^{X}_{i,t}}
+  \left( \frac{C_{i,t+1}}{C_{i,t}} \right)^{\sigma}
+  \left( \frac{L_{i,t+1}}{L_{i,t}} \right)^{1 - \sigma}. \label{eq:capital-euler-ratio}
 \end{align}
-
-Substitute \eqref{eq:xi} at $t$ and $t+1$ into \eqref{eq:kfoc}, divide by $\lambda_{i,t+1}$,
-and use the bond FOC $\lambda_{i,t}/\lambda_{i,t+1}
-= R_{i,t+1}/\left[1+\phi_{i,t}\left(B_{i,t+1}-\bar{B}_i\right)\right]$ from \eqref{eq:foc-B}.
-Multiplying through by $\sigma$:
-\begin{align}
-  \frac{R_{i,t+1}}{1+\phi_{i,t}\left(B_{i,t+1}-\bar{B}_i\right)}\,
-  \frac{P^X_{i,t}}{\chi_{i,t}}\left(\frac{X_{i,t}}{K_{i,t}}\right)^{1-\sigma}
-  = \sigma\, r_{i,t+1}
-  + (1-\sigma)\frac{P^X_{i,t+1}X_{i,t+1}}{K_{i,t+1}}
-  + (1-d)\frac{P^X_{i,t+1}}{\chi_{i,t+1}}
-  \left(\frac{X_{i,t+1}}{K_{i,t+1}}\right)^{1-\sigma}. \label{eq:capital-euler}
-\end{align}
-
-Work through interpretation here:
 
 %=======================================================
 \section*{Part B: Recovering the Model's Disturbances}
 %=======================================================
+Every disturbance is a function of observables and of the structural parameters;
+each subsection gives the closed-form recovery. Throughout, nominal aggregates
+are scaled by the country's population so that per-capita magnitudes enter the
+formulas.
+
+%-------------------------------------------------------
+\subsection*{Investment Demand Shifters}
+%-------------------------------------------------------
+Using the investment share equation \eqref{eq:invshares} in logs,
+\begin{align}
+  \ln s^{x,j}_{i,t} = \ln \mu^{x,j}_{i,t} + \left( \zeta - 1 \right)
+  \left( \ln P^{X}_{i,t} - \ln P^j_{i,t} \right), \label{eq:mux}
+\end{align}
+so the recovered shifters are
+\begin{align}
+  \mu^{x,j}_{i,t} = s^{x,j}_{i,t}
+  \left( \frac{P^{X}_{i,t}}{P^j_{i,t}} \right)^{1 - \zeta}, \label{eq:PXrecover}
+\end{align}
+
+%-------------------------------------------------------
+\subsection*{Consumption Demand Shifters}
+%-------------------------------------------------------
+From the consumption share equation \eqref{eq:cons-shares}, define the
+expenditure-share-weighted mean of the log price index,
+\begin{align}
+  \ln P_{i,t} = \sum_{j \in \mathcal{J}} s^j_{i,t} \ln P^j_{i,t}, \label{eq:mc-exp}
+\end{align}
+and the supply-side expression for the aggregate consumption price is
+\begin{align}
+  \ln P_{i,t} = \wbar{\ln p^j_{i,t}} - \frac{\psi - 1}{\psi} \ln
+  \left( \frac{C_{i,t}}{L_{i,t}} \right), \label{eq:consexp-supply}
+\end{align}
+where $\wbar{\ln p^j_{i,t}}$ is the expenditure-weighted mean of $\ln P^j_{i,t}$
+computed from the estimated model. Matching the demand side,
+\begin{align}
+  \ln P_{i,t} = \frac{\psi - 1}{\psi} \ln \left( \frac{C_{i,t}}{L_{i,t}} \right)
+  - \frac{1}{\psi} \ln \left( \sum_{j \in \mathcal{J}} s^j_{i,t} \right),
+  \label{eq:consexp-demand1}
+\end{align}
+and, using the recovered budget shares,
+\begin{align}
+  s^j_{i,t} = \sum_{j \in \mathcal{J}} \frac{1}{\psi} s^j_{i,t} \varepsilon^j
+  \qquad\Longrightarrow\qquad
+  \ln \mu^{c,j}_{i,t} = \psi \left( \ln P^j_{i,t} - \ln P_{i,t} \right)
+  + \ln s^j_{i,t}. \label{eq:consexp-demand2}
+\end{align}
+The consumption aggregation shifters therefore read
+\begin{align}
+  \mu^{c,j}_{i,t} = s^j_{i,t} \left( \frac{P^j_{i,t}}{P_{i,t}} \right)^{\psi}
+  \left( \frac{C_{i,t}}{L_{i,t}} \right)^{1 - \psi}, \label{eq:mu-tradables}
+\end{align}
 
 %-------------------------------------------------------
 \subsection*{Sectoral Productivities and Trade Costs}
 %-------------------------------------------------------
-
-Inverting the price index $P^j_{i,t} = \Gamma\big[\Phi^j_{i,t}\big]^{-\frac{1}{\theta}}$:
+From the firm's cost-minimization FOCs \eqref{eq:foc-D} and the unit cost
+\eqref{eq:unitcost}, the terms-of-trade ratio between two countries $h$ and $i$
+in sector $j$ is
 \begin{align}
-  \Phi^j_{i,t} = \Gamma^{\theta}\left(P^j_{i,t}\right)^{-\theta}. \label{eq:Phi-inv}
+  \frac{P^{h,j}_{i,t}}{P^{i,j}_{i,t}} =
+  \left( \frac{\Gamma^{i,j}_{i,t}}{\Gamma^{h,j}_{h,t}} \right)^{\frac{1}{1 - \eta}}
+  \frac{\upsilon^{j}_{h,t}}{\upsilon^{j}_{i,t}}, \label{eq:Phi-inv}
 \end{align}
-
-\textit{Productivities.} Set $h = i$ in the gravity equation \eqref{eq:gravity} and use
-$\tau^j_{ii,t} = 1$ and \eqref{eq:Phi-inv}:
+which, using the gravity trade-share ratio, gives the bilateral share ratio:
 \begin{align}
-  \pi^j_{ii,t}
-  &= \frac{T^j_{i,t}\left(c^j_{i,t}\right)^{-\theta}}{\Phi^j_{i,t}}
-   = \frac{T^j_{i,t}\left(c^j_{i,t}\right)^{-\theta}}{\Gamma^{\theta}\left(P^j_{i,t}\right)^{-\theta}}
-   = T^j_{i,t}\left(\Gamma\,\frac{c^j_{i,t}}{P^j_{i,t}}\right)^{-\theta}
-   \quad\text{for } j\in\mathcal{J}\backslash S \label{eq:homeshare}\\
-  \Rightarrow\quad
-  T^j_{i,t} &= \pi^j_{ii,t}\left(\Gamma\,\frac{c^j_{i,t}}{P^j_{i,t}}\right)^{\theta},
+  \frac{\pi^{h,j}_{i,t}}{\pi^{i,j}_{i,t}} =
+  \left( \frac{\Gamma^{i,j}_{h,t}}{\Gamma^{h,j}_{h,t}} \right)
+  \left( \frac{P^{i,j}_{h,t}}{P^{h,j}_{h,t}} \right)^{1 - \eta}, \label{eq:gravity-ratio}
 \end{align}
-
-
-\textit{Trade costs.} Divide \eqref{eq:gravity} by the \emph{exporter's} home share
-$\pi^j_{hh,t}$; the terms $T^j_{h,t}\big(c^j_{h,t}\big)^{-\theta}$ cancel:
+Setting $h = i$ in the gravity equation \eqref{eq:gravity} to get the home share,
 \begin{align}
-  \frac{\pi^j_{ih,t}}{\pi^j_{hh,t}}
-  &= \frac{T^j_{h,t}\left(c^j_{h,t}\tau^j_{ih,t}\right)^{-\theta}\big/\Phi^j_{i,t}}
-          {T^j_{h,t}\left(c^j_{h,t}\right)^{-\theta}\big/\Phi^j_{h,t}}
-   = \left(\tau^j_{ih,t}\right)^{-\theta}\frac{\Phi^j_{h,t}}{\Phi^j_{i,t}}
-   = \left(\tau^j_{ih,t}\right)^{-\theta}
-     \left(\frac{P^j_{i,t}}{P^j_{h,t}}\right)^{\theta}, \label{eq:gravity-ratio}
+  \pi^{i,j}_{i,t} = \frac{\Gamma^{i,j}_{i,t} \left( P^{i,j}_{i,t} \right)^{1 - \eta}}
+  {\sum_{k} \Gamma^{k,j}_{i,t} \left( P^{k,j}_{i,t} \right)^{1 - \eta}} =
+  \frac{1}{1 + \sum_{h \neq i} \frac{\pi^{h,j}_{i,t}}{\pi^{i,j}_{i,t}}}, \label{eq:homeshare}
 \end{align}
-using \eqref{eq:Phi-inv} in the last step. Solving:
-\begin{align}
-  \tau^j_{ih,t} = \frac{P^j_{i,t}}{P^j_{h,t}}
-  \left(\frac{\pi^j_{hh,t}}{\pi^j_{ih,t}}\right)^{\frac{1}{\theta}}
-  \quad\text{for } j\in\mathcal{J}\backslash S.
-\end{align}
-
-
-%-------------------------------------------------------
-\subsection*{Sectoral Demand Shifters}
-%-------------------------------------------------------
-
-We recover $\mu^j_{i,t}$ by computing consumption expenditure two ways ( supply and demand sides) and equating them.
-
-\textit{Supply side.} Multiply goods market clearing by $P^j_{i,t}$:
-\begin{align}
-  C^j_{i,t} + X^j_{i,t} + \sum_{m\in\mathcal{J}} D^{m,j}_{i,t} = Q^j_{i,t}
-  \quad\Rightarrow\quad
-  P^j_{i,t}C^j_{i,t} + P^j_{i,t}X^j_{i,t} + \sum_{m\in\mathcal{J}} P^j_{i,t}D^{m,j}_{i,t}
-  = E^j_{i,t}, \label{eq:mc-exp}
-\end{align}
-where $E^j_{i,t} \equiv P^j_{i,t}Q^j_{i,t}$. Since $NX^j_{i,t} = Y^j_{i,t} - E^j_{i,t}$
-with $Y^j_{i,t} = \sum_h \pi^j_{hi,t}E^j_{h,t}$, we have $E^j_{i,t} = Y^j_{i,t} - NX^j_{i,t}$.
-Substituting this and the investment shares \eqref{eq:invshares},
-$P^j_{i,t}X^j_{i,t} = \upsilon^j_i\big(P^j_{i,t}/P^X_{i,t}\big)^{1-\zeta}P^X_{i,t}X_{i,t}$,
-isolates consumption expenditure:
-\begin{align}
-  P^j_{i,t}C^j_{i,t}
-  = Y^j_{i,t} - NX^j_{i,t}
-  - \sum_{m\in\mathcal{J}} P^j_{i,t}D^{m,j}_{i,t}
-  - \upsilon^j_i\left(\frac{P^j_{i,t}}{P^X_{i,t}}\right)^{1-\zeta}P^X_{i,t}X_{i,t}. \label{eq:consexp-supply}
-\end{align}
-
-\textit{Demand side.} Multiply \eqref{eq:demand-final} by $P^j_{i,t}$:
-\begin{align}
-  \frac{P^j_{i,t}C^j_{i,t}}{L_{i,t}}
-  = \mu^j_{i,t}\left(\frac{C_{i,t}}{L_{i,t}}\right)^{\varepsilon^j}
-    \left(P^j_{i,t}\right)^{1-\psi}\left(P^C_{i,t}\right)^{\psi}. \label{eq:consexp-demand1}
-\end{align}
-Since $E^C_{i,t} = P^C_{i,t}C_{i,t}$,
-$P^C_{i,t} = \big(E^C_{i,t}/L_{i,t}\big)\big/\big(C_{i,t}/L_{i,t}\big)$, so:
-\begin{align}
-  \left(P^C_{i,t}\right)^{\psi}
-  = \left(\frac{E^C_{i,t}}{L_{i,t}}\right)^{\psi}
-    \left(\frac{C_{i,t}}{L_{i,t}}\right)^{-\psi}
-  \quad\Rightarrow\quad
-  \frac{P^j_{i,t}C^j_{i,t}}{L_{i,t}}
-  = \mu^j_{i,t}\left(P^j_{i,t}\right)^{1-\psi}
-    \left(\frac{E^C_{i,t}}{L_{i,t}}\right)^{\psi}
-    \left(\frac{C_{i,t}}{L_{i,t}}\right)^{\varepsilon^j-\psi}. \label{eq:consexp-demand2}
-\end{align}
-
-\textit{Equate and solve.} Setting \eqref{eq:consexp-supply} equal to
-\eqref{eq:consexp-demand2}:
-\begin{align}
-  \mu^j_{i,t} =
-  \frac{Y^j_{i,t} - NX^j_{i,t}
-        - \sum_{m\in\mathcal{J}} \frac{(1-\beta^j_i)\nu^{j,m}_i}{P^j_i,t} 
-        - \upsilon^j_i\left(\frac{P^j_{i,t}}{P^X_{i,t}}\right)^{1-\zeta}P^X_{i,t}X_{i,t}}
-       {L_{i,t}\left(P^j_{i,t}\right)^{1-\psi}
-        \left(\frac{E^C_{i,t}}{L_{i,t}}\right)^{\psi}
-        \left(\frac{C_{i,t}}{L_{i,t}}\right)^{\varepsilon^j-\psi}}
-  \quad\text{for } j\in\mathcal{J}\backslash s. \label{eq:mu-tradables}
-\end{align}
-
 
 %-------------------------------------------------------
 \subsection*{Financial Friction $\phi_{i,t}$}
 %-------------------------------------------------------
-Ok this one was a shot in the dark since its specified differently than the paper but I was able to get something (no idea if this is right tho) I wasn't able to solve for the efficency shifter - the recursive thing was confusing. I just work on coding everything else up and let you expalin that one) 
-
-The Euler equation \eqref{eq:euler} contains the  unknowns: the friction $\phi_{i,t}$ and the interest rate $R_{t+1}$. 
-First  world bonds in zero net supply (per paper) so we have a world interest rate $R_{i,t+1} = R_{t+1}$ and second we can get bonds from net exports $B_{i,t+1} = R_t B_{i,t} + NX_{i,t}$. ( The rebated adustment cost $T_{i,t}$, should make this work.)
-
-
-Frist we rewrite the Euler equation in observables. Multiply \eqref{eq:euler} by
-$L_{i,t+1}/L_{i,t}$ so the left side becomes total expenditure growth,
-$E^C_{i,t} = L_{i,t}\,P^C_{i,t}\,\bar{C}_{i,t}$:
+The world interest rate comes from the US Euler equation (expenditure form),
 \begin{align}
-  \frac{E^C_{i,t+1}}{E^C_{i,t}}
-  = \frac{L_{i,t+1}}{L_{i,t}}\cdot
-    \frac{\widetilde{\phi}_{i,t+1}}{\widetilde{\phi}_{i,t}}\cdot
-    \frac{\delta\,R_{t+1}}{1+\phi_{i,t}\left(B_{i,t+1}-\bar{B}_i\right)}. \label{eq:euler-exp}
+  1 = \beta R_{t+1} \left( \frac{E^C_{US,t+1}}{E^C_{US,t}} \right)^{-\sigma}
+  \left( \frac{L_{US,t+1}}{L_{US,t}} \right)^{2\sigma - 1}, \label{eq:euler-exp}
 \end{align}
-This gives one equation per country: two equations, three unknowns
-($\phi_{US,t}$, $\phi_{ROW,t}$, $R_{t+1}$).
-
-We have to normalize (In the paper you normalized to unity, I could only make it work with 0 here)
+using the balance-of-payments identity for the ROW mirror,
 \begin{align}
-  \phi_{ROW,t} = 0.
+  B_{R,t+1} = - B_{US,t+1}, \label{eq:bop}
+\end{align}
+so that bond positions mirror exactly,
+\begin{align}
+  B_{R,t} = - B_{US,t}, \label{eq:bmirror}
+\end{align}
+Then the friction is recovered from the ROW Euler equation:
+\begin{align}
+  \phi_{R,t} = 1 - \frac{R_{t+1}}{\bar{R}_{R,t+1}}, \label{eq:phi-recover}
+\end{align}
+where $\bar{R}_{R,t+1}$ is the ROW's own rate that would clear its bond market
+in the absence of the friction.
+
+%-------------------------------------------------------
+\subsection*{Investment Tax Growth $g_{i,t}$}
+%-------------------------------------------------------
+The rental rate on capital from the firm FOC is
+\begin{align}
+  R_{i,t} = \theta^j \frac{P^j_{i,t} Q^j_{i,t}}{K^j_{i,t}} = \theta^j \frac{P^j_{i,t} Y^j_{i,t}}{K^j_{i,t}}, \label{eq:rental}
+\end{align}
+and the capital stock evolves as
+\begin{align}
+  K_{i,t+1} = (1 - \delta) K_{i,t} + X_{i,t}, \label{eq:kpath}
+\end{align}
+From the capital accumulation Euler at $\sigma = 1$ (log utility), the growth rate
+of the investment tax is
+\begin{align}
+  g_{i,t} \equiv \frac{1 - \xi_{i,t+1}}{1 - \xi_{i,t}} =
+  \beta R_{i,t+1} \frac{L_{i,t+1}}{L_{i,t}}
+  \frac{P^{X}_{i,t}}{P^{X}_{i,t+1}}, \label{eq:xi-recover}
 \end{align}
 
- With
-$\phi_{ROW,t}=0$, the only unknown left in the ROW's equation is $R_{t+1}$:
-\begin{align}
-  R_{t+1} = \frac{1}{\delta}\cdot
-  \frac{E^C_{ROW,t+1}}{E^C_{ROW,t}}\cdot
-  \frac{L_{ROW,t}}{L_{ROW,t+1}}\cdot
-  \frac{\widetilde{\phi}_{ROW,t}}{\widetilde{\phi}_{ROW,t+1}}. \label{eq:worldR}
-\end{align}
-
- With $R_{t+1}$ known,
-the only unknown left in the US's equation is $\phi_{US,t}$:
-\begin{align}
-  \phi_{US,t}
-  = \frac{1}{B_{US,t+1}-\bar{B}_{US}}
-    \left[
-    \frac{E^C_{US,t}}{E^C_{US,t+1}}\cdot
-    \frac{L_{US,t+1}}{L_{US,t}}\cdot
-    \frac{\widetilde{\phi}_{US,t+1}}{\widetilde{\phi}_{US,t}}\cdot
-    \delta\,R_{t+1}
-    - 1\right]. \label{eq:phi-recover}
-\end{align}
 %=======================================================
-\section*{Part C: Solving the Model Forward}
-%=======================================================
-
-Part B takes prices as data; in the counterfactual they are unknowns, so the conditions of
-Part A have to be restated in changes. A prime is a counterfactual level and a hat the ratio
-of the two, $\hd{x}\equiv x'/x$, taken within a year, so hatted objects suppress $t$. Working
-in ratios removes $\Gamma$, $\kappa^j_i$, $\mu^j_{i,t}$ and the levels of $T^j_{i,t}$ and
-$\tau^j_{ih,t}$, none of which then has to be measured.
-
-%-------------------------------------------------------
-\subsection*{Factor Markets: The Wage Is the Only Free Price}
-%-------------------------------------------------------
-Total cost equals revenue, so the factor bills \eqref{eq:foc-k}--\eqref{eq:foc-l} scale to
-sector output by $Y^j_{i,t}$. Summing over sectors, with
-$VA_{i,t}\equiv\sum_j\beta^j_iY^j_{i,t}$:
-\begin{align}
-  w_{i,t}L_{i,t}=\left(1-\varphi_i\right)VA_{i,t},
-  \qquad
-  r_{i,t}K_{i,t}=\varphi_i\,VA_{i,t}. \label{eq:factormkt}
-\end{align}
-Both shares are fixed and both endowments are unchanged, $\hd{K}_i=\hd{L}_i=1$, so
-\begin{align}
-  \hd{w}_i=\hd{r}_i=\hd{VA}_i. \label{eq:factorhat}
-\end{align}
-One number per country. We take it to be $\hd{w}_i$, which is what enters the cost function;
-income follows as $VA'_i=VA_{i,t}\hd{w}_i$.
-
-%-------------------------------------------------------
-\subsection*{Firms: Unit Costs in Changes}
-%-------------------------------------------------------
-Taking \eqref{eq:unitcost} at the counterfactual over the baseline, $\kappa^j_i$ cancels and
-by \eqref{eq:factorhat} the factor bundle collapses to $\hd{w}_i$:
-\begin{align}
-  \hd{c}^j_i=\left(\hd{w}_i\right)^{\beta^j_i}
-  \prod_{m\in\mathcal{J}}\left(\hd{P}^m_i\right)^{\nu^{j,m}_i\left(1-\beta^j_i\right)}.
-  \label{eq:chat}
-\end{align}
-
-%-------------------------------------------------------
-\subsection*{Trade: Prices and Trade Shares in Changes}
-%-------------------------------------------------------
-\textit{Prices.} Since $P^j_{i,t}=\Gamma\big[\Phi^j_{i,t}\big]^{-1/\theta}$, in changes
-$\big(\hd{P}^j_i\big)^{-\theta}=\Phi'^j_i/\Phi^j_i$ and $\Gamma$ drops. Multiplying each term
-of the numerator by its own baseline counterpart over itself, the weight is the baseline trade
-share of \eqref{eq:gravity}:
-\begin{align}
-  \left(\hd{P}^j_i\right)^{-\theta}
-  = \frac{\sum_h T'^j_h\left(c'^j_h\tau'^j_{ih}\right)^{-\theta}}
-         {\sum_k T^j_k\left(c^j_k\tau^j_{ik}\right)^{-\theta}}
-  = \sum_h
-    \underbrace{\frac{T^j_h\left(c^j_h\tau^j_{ih}\right)^{-\theta}}
-                     {\sum_k T^j_k\left(c^j_k\tau^j_{ik}\right)^{-\theta}}}_{=\,\pi^j_{ih,t}}
-    \hd{T}^j_h\left(\hd{c}^j_h\hd{\tau}^j_{ih}\right)^{-\theta},
-\end{align}
-\begin{align}
-  \left(\hd{P}^j_i\right)^{-\theta}
-  = \sum_h \pi^j_{ih,t}\,\hd{T}^j_h\left(\hd{c}^j_h\hd{\tau}^j_{ih}\right)^{-\theta}.
-  \label{eq:Phat}
-\end{align}
-Equations \eqref{eq:chat} and \eqref{eq:Phat} are mutually dependent and solved together by
-iteration, which contracts at rate $1-\beta^j_i$.
-
-\textit{Trade shares.} Taking \eqref{eq:gravity} at the two equilibria, the denominator is
-$\Phi'^j_i/\Phi^j_i=\big(\hd{P}^j_i\big)^{-\theta}$:
-\begin{align}
-  \pi'^j_{ih}=\pi^j_{ih,t}\,\hd{T}^j_h
-  \left(\frac{\hd{c}^j_h\hd{\tau}^j_{ih}}{\hd{P}^j_i}\right)^{-\theta}. \label{eq:pinew}
-\end{align}
-Summing over $h$ and using \eqref{eq:Phat} returns one.
-
-%-------------------------------------------------------
-\subsection*{Households: Budget Constraint and Investment}
-%-------------------------------------------------------
-The adjustment cost is rebated, so those terms cancel in \eqref{eq:bc}. Factor income is
-$VA_{i,t}$ by \eqref{eq:factormkt}, and the bond terms collapse through
-$B_{i,t+1}-R_{i,t}B_{i,t}=NX_{i,t}$:
-\begin{align}
-  E^C_{i,t}=VA_{i,t}-E^X_{i,t}-NX_{i,t}. \label{eq:budget-reduced}
-\end{align}
-The interest rate does not appear: the static block needs only net exports.
-
-\textit{Investment.} At $\sigma=0$ the law of motion is
-$K_{i,t+1}=\left(1-d+\chi_{i,t}\right)K_{i,t}$ and $X_{i,t}$ drops out, so \eqref{eq:xi} has a
-positive left side and a zero right side and the optimum is $X_{i,t}=0$. Observed investment
-is positive, so we impose rather than derive $E^{X\prime}_i=x_{i,t}VA'_i$ with
-$x_{i,t}\equiv E^X_{i,t}/VA_{i,t}$. Then
-\begin{align}
-  E^{C\prime}_i=\left(1-x_{i,t}\right)VA_{i,t}\hd{w}_i-NX'_{i,t}. \label{eq:ECprime}
-\end{align}
-
-%-------------------------------------------------------
-\subsection*{Households: Inverting the Price Index}
-%-------------------------------------------------------
-Equation \eqref{eq:priceindex} depends on the level of real consumption, so the consumption
-block cannot be taken in changes directly. Rearranging \eqref{eq:cons-shares} term by term,
-$\mu^j_{i,t}\bar{C}_{i,t}^{(1-\psi)(\varepsilon^j-1)}\big(P^j_{i,t}\big)^{1-\psi}
-=s^j_{i,t}\big(P^C_{i,t}\big)^{1-\psi}$. Substituting that for each baseline term in the ratio
-of \eqref{eq:priceindex}, with $\hd{\bar{C}}_i=\hd{C}_i$:
-\begin{align}
-  \left(\hd{P}^C_i\right)^{1-\psi}
-  = \sum_{j\in\mathcal{J}}s^j_{i,t}\left(\hd{P}^j_i\right)^{1-\psi}
-    \hd{C}_i^{\,(1-\psi)(\varepsilon^j-1)}. \label{eq:PChat}
-\end{align}
-The shifter cancels, so nothing depends on the arbitrary normalization
-$\sum_j\mu^j_{i,t}=\kappa_i$. Since $\hd{E}^C_i=\hd{P}^C_i\hd{C}_i$, substituting
-\eqref{eq:PChat} leaves one equation in $\hd{C}_i$:
-\begin{align}
-  \hd{E}^C_i=\hd{C}_i\left[\sum_{j\in\mathcal{J}}s^j_{i,t}\left(\hd{P}^j_i\right)^{1-\psi}
-  \hd{C}_i^{\,(1-\psi)(\varepsilon^j-1)}\right]^{\frac{1}{1-\psi}}, \label{eq:cinv}
-\end{align}
-with the left side from \eqref{eq:ECprime}. Differentiating its logarithm and using
-$\sum_j s'^j_i=1$:
-\begin{align}
-  \frac{\partial\ln(\text{RHS})}{\partial\ln\hd{C}_i}
-  = 1+\sum_{j\in\mathcal{J}}s'^j_i\left(\varepsilon^j-1\right)
-  = \sum_{j\in\mathcal{J}}s'^j_i\varepsilon^j
-  = \frac{1}{\widetilde{\phi}_i}, \label{eq:cinv-slope}
-\end{align}
-the reciprocal of the object in \eqref{eq:euler}, so the root is unique.
-
-\textit{Shares.} Taking \eqref{eq:cons-shares} at the two equilibria:
-\begin{align}
-  s'^j_i=s^j_{i,t}\left(\frac{\hd{P}^j_i}{\hd{P}^C_i}\right)^{1-\psi}
-  \hd{C}_i^{\,(1-\psi)(\varepsilon^j-1)}. \label{eq:shat}
-\end{align}
-Summing over $j$ reproduces \eqref{eq:PChat}. With equal income elasticities
-$\hd{C}_i^{(1-\psi)(\varepsilon^j-1)}$ is common to all $j$ and cancels against $\hd{P}^C_i$:
-this term is the structural change mechanism.
-
-%-------------------------------------------------------
-\subsection*{Market Clearing: The Leontief System}
-%-------------------------------------------------------
-Scaling \eqref{eq:foc-D} to sector output, the intermediate term in \eqref{eq:mc-exp} is
-$\sum_m\nu^{m,j}_i\left(1-\beta^m_i\right)Y^m_{i,t}$, with gross output as the base and the
-buying sector $m$ transposed relative to \eqref{eq:tech}. Substituting it and eliminating $Y$
-with $Y^j_{i,t}=\sum_h\pi^j_{hi,t}E^j_{h,t}$ leaves the expenditures on both sides, but
-linearly:
-\begin{align}
-  E'^j_i=s'^j_iE^{C\prime}_i+\upsilon^j_iE^{X\prime}_i
-  +\sum_{m\in\mathcal{J}}\nu^{m,j}_i\left(1-\beta^m_i\right)\sum_h\pi'^m_{hi}E'^m_h.
-  \label{eq:Esub}
-\end{align}
-Stacking the country-sector pairs, with $\Pi'$ mapping expenditure to output and $\Gamma$
-output back to input demand,
-\begin{align}
-  F_{(j,i)}=s'^j_iE^{C\prime}_i+\upsilon^j_iE^{X\prime}_i,
-  \quad
-  \Gamma_{(j,i),(m,i)}=\nu^{m,j}_i\left(1-\beta^m_i\right),
-  \quad
-  \Pi'_{(j,i),(j,h)}=\pi'^j_{hi},
-\end{align}
-\begin{align}
-  E'=\left[I-\Gamma\Pi'\right]^{-1}F, \qquad Y'=\Pi'E'. \label{eq:leontief}
-\end{align}
-$\Gamma$ is block diagonal by country and holds no prices; $\Pi'$ is block diagonal by sector
-and moves with the guess. The inverse exists because the column sums of $\Gamma\Pi'$ are
-bounded by the intermediate share:
-\begin{align}
-  \sum_{(j,i)}\left(\Gamma\Pi'\right)_{(j,i),(m,h)}
-  = \sum_i\left(1-\beta^m_i\right)\pi'^m_{hi}\underbrace{\sum_j\nu^{m,j}_i}_{=\,1}
-  \le \max_i\left(1-\beta^m_i\right)<1. \label{eq:colsums}
-\end{align}
-
-%-------------------------------------------------------
-\subsection*{Closing the Static Block}
-%-------------------------------------------------------
-Output implies income through $VA'_i=\sum_j\beta^j_iY'^j_i$, so a correct wage reproduces
-itself and the year is a scalar fixed point:
-\begin{align}
-  g\left(\hd{w}_{US}\right)
-  \equiv\frac{\sum_j\beta^j_{US}Y'^j_{US}}{VA_{US,t}\hd{w}_{US}}-1=0. \label{eq:gresid}
-\end{align}
-The residual falls in the guess: a higher wage raises costs by \eqref{eq:chat} and prices by
-\eqref{eq:Phat}, buyers shift away by \eqref{eq:pinew}, and implied income returns below the
-guess.
-
-\textit{The redundant equation.} Summing \eqref{eq:mc-exp} over sectors returns
-\eqref{eq:budget-reduced}, and over countries as well makes world output equal world
-expenditure identically, hence $\sum_i NX_{i,t}=0$. One of the twenty-four static equations is
-implied by the others.
-
-\textit{The numeraire.} The system is homogeneous of degree one in prices, nominal quantities
-and $NX$, so it fixes only relative prices. Replacing the redundant equation with
-\begin{align}
-  \hd{w}_R=1 \label{eq:numeraire}
-\end{align}
-and using $NX'_{R,t}=-NX'_{US,t}$ leaves $\hd{w}_{US}$ as the only free number in the year.
-
-%-------------------------------------------------------
-\subsection*{Closing the Intertemporal Block}
-%-------------------------------------------------------
-Equation \eqref{eq:euler-exp} holds for $t=1,\dots,T-1$: $T-1$ restrictions on the $T$
-unknowns $\{NX'_{US,t}\}_{t=1}^T$. It restricts the tilt of the path, not its level, since
-shifting borrowing up in every year leaves every instance satisfied. Part A pins the level by
-transversality; truncating at $T$ removes it, so we impose
-\begin{align}
-  B'_{US,T+1}=B_{US,T+1}. \label{eq:terminal}
-\end{align}
-Without it the counterfactual can borrow and never repay, and the comparison measures a
-windfall. It is a choice, and it binds at the last date, which is where the outcome is
-measured, so the answer's sensitivity to the horizon is a diagnostic.
-
-The world interest rate is not an unknown: with $\phi_{ROW,t}=0$ from Part B the rest of the
-world's saving equation contains only $R_{t+1}$ and \eqref{eq:worldR} gives it, now on the
-counterfactual consumption path.
 \end{document}
-

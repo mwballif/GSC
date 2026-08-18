@@ -1,11 +1,11 @@
 %==============================================================================
-% extract_data_LR
+% extract_data_LR.m
 %
 % Purpose: Process one year of the Long Run WIOT into year-level CSV files.
-% In:      year  scalar year, e.g. 1965
-% Out:     per-year CSV files in data/processed/intermediate
+% Reads:   data/raw/LR WIOT <year> tables
+% Writes:  per-year CSV files in data/processed/intermediate
 %
-% NOTE: called per year by createpanels.m, not directly.
+% NOTE: called with a year argument by createpanels.m, not directly.
 %
 % Data layout. Columns are interleaved by country. Each country block holds
 % J_o intermediate columns followed by F_o final demand columns. The four

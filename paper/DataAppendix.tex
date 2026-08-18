@@ -14,50 +14,120 @@
 
 \maketitle
 
-\section*{Data Appendix: Sectoral Prices}
+\section*{Data Appendix: Sectoral Prices, Trade Costs, and Aggregation}
 
 \subsection*{Data Sources}
 
-\textbf{Price Levels:} Productivity Level Database (PLD) 2005, Groningen Growth and Development Centre. Provides sectoral price levels relative to the United States (USA = 1.00) for benchmark year 2005.
+\textbf{Price Levels:} Productivity Level Database (PLD) 2023, Groningen Growth and Development
+Centre. Provides sectoral gross output price levels relative to the United States (USA = 1.00) for
+the benchmark year 2005.
 
-\textbf{Price Growth:} GGDC 10-Sector Database, Groningen Growth and Development Centre. Provides sectoral value-added deflators for 1950--2015.
+\textbf{Gross output deflators:} two World Input-Output Database (WIOD) releases: the Long-Run
+release (1965--2000) and the Release 2016 socioeconomic accounts (2000--2014), spliced at 2000.
+
+\textbf{Nominal exchange rates:} Penn World Table, local currency per U.S. dollar.
+
+\textbf{World interest rate:} market yield on the 10-year U.S. Treasury note at constant maturity,
+FRED series \texttt{DGS10}, annual averages 1965--2014. Entered as the gross rate
+$R_t = 1 + i_t/100$. Bonds are in zero net supply, so the same $R_t$ faces both countries and each
+country's financial friction is recovered from its own Euler equation.
 
 \subsection*{Sector Definitions}
 
-We aggregate the 10-sector ISIC classification to three broad sectors:
-\begin{itemize}
-    \item \textit{Agriculture}: GGDC sector AtB (Agriculture, hunting, forestry, and fishing)
-    \item \textit{Manufacturing}: GGDC sectors C, D, E (Mining, manufacturing, and utilities)
-    \item \textit{Services}: GGDC sectors F through P (Construction through other services)
-\end{itemize}
+We aggregate the underlying subsector classification to three broad sectors, mapping agriculture,
+mining/manufacturing/utilities, and services to AGR, MAN, and SER respectively.
 
 \subsection*{Construction of Sectoral Prices}
 
-For each country $c$, sector $i$, and year $t$, we construct internationally comparable sectoral price levels as follows:
+For each country $c$, sector $i$, and year $t$ we construct an internationally comparable sectoral
+price level as follows:
 
 \begin{enumerate}
-    \item Extract gross output price indices from GGDC Socioeconomic accounts: $\pi_{i,c,t}$ (originally base year 1995 or 2010 depending on release)
-    
-    \item Normalize price indices to 2005 base year within each country-sector:
+    \item Extract gross output price indices from each WIOD release. The Long-Run release is
+    expressed in USD and is converted to local currency by multiplying by the \emph{fixed 2005}
+    nominal exchange rate $e_{c,2005}$; the Release 2016 index is already in local currency. Using a
+    fixed rate here, rather than the current-year rate, ensures the year-over-year movement of the
+    Long-Run deflators reflects only real relative prices and not the dollar cycle.
+
+    \item Chain-link the two releases at 2000, taking Long-Run levels through 2000 and Release 2016
+    growth rates after, then normalize to 2005 within each country-sector:
     \begin{equation}
-        \tilde{\pi}_{i,c,t} = \frac{\pi_{i,c,t}}{\pi_{i,c,2005}}
+        \tilde{\pi}_{i,c,t} = \frac{\pi_{i,c,t}}{\pi_{i,c,2005}},
     \end{equation}
     where $\tilde{\pi}_{i,c,2005} = 1$ for all countries and sectors.
-    
-    \item Extract 2005 benchmark gross output PPP rates from PLD 2023: $\text{PPP}_{i,c}$ (local currency per USD). These are computed as geometric averages of detailed product-level PPPs, weighted by gross output shares within each broad sector.
-    
-    \item Extract nominal exchange rates from PWT: $e_{c,t}$ (local currency per USD in year $t$)
-    
-    \item Construct internationally comparable price levels:
+
+    \item Extract the 2005 gross output benchmark PPP for each sector from PLD, $\text{PPP}_{i,c}$
+    (local currency per USD), formed as a geometric mean of product-level PPPs weighted by gross
+    output shares within the broad sector.
+
+    \item Hold the nominal exchange rate at its 2005 value, $e_{c,2005}$, rather than the
+    current-year rate.
+
+    \item Construct the internationally comparable price level:
     \begin{equation}
-        P_{i,c,t} = \tilde{\pi}_{i,c,t} \cdot \frac{\text{PPP}_{i,c}}{e_{c,t}}
+        P_{i,c,t} = \tilde{\pi}_{i,c,t} \cdot \frac{\text{PPP}_{i,c}}{e_{c,2005}}.
     \end{equation}
 \end{enumerate}
 
-This procedure anchors each country-sector's price level to the 2005 PPP benchmark, then uses national accounts deflators to extrapolate forward and backward in time. The division by the nominal exchange rate converts to a common currency basis.
+The exchange rate is fixed at 2005 so that the level across countries reflects only real relative
+prices, not the nominal dollar cycle. The same $e_{c,2005}$ converts the Long-Run deflators out of
+USD before the splice, so the exchange rate never varies within a country's time series. At 2005,
+$\tilde{\pi}_{i,c,2005}=1$, so
+$P_{i,c,2005}=\text{PPP}_{i,c}/e_{c,2005}$ is the sectoral price level relative to the United States.
+In other years the level moves only with the within-country deflator $\tilde{\pi}_{i,c,t}$. For the
+United States, $\text{PPP}_{i,\text{USA}}=e_{\text{USA},2005}=1$, so $P_{i,\text{USA},t}=\tilde{\pi}_{i,\text{USA},t}$,
+a pure within-country price index.
 
-The resulting price level $P_{i,c,t}$ is interpretable as follows: at the 2005 benchmark year, $P_{i,c,2005} = \text{PPP}_{i,c}/e_{c,2005}$ represents the sectoral gross output price level in country $c$ relative to the United States. In other years, $P_{i,c,t}$ incorporates both within-country price changes (via $\tilde{\pi}_{i,c,t}$) and exchange rate movements (via $e_{c,t}$). For the United States, $\text{PPP}_{i,\text{USA}} = e_{\text{USA},t} = 1$ by construction, so $P_{i,\text{USA},t} = \tilde{\pi}_{i,\text{USA},t}$, a pure within-country price index.
+\subsection*{Trade Shares}
 
+Bilateral sectoral trade flows come from the same two WIOD releases, spliced at 2000 on a single
+matrix. Country $c$'s own domestic share $\pi_{cc,t}^{i}$ and its bilateral shares $\pi_{ch,t}^{i}$
+(importing sector $i$ sourced from exporter $h$) are the row shares of that matrix. The diagonal
+$\pi_{cc,t}^{i}$ is the share of home goods in home spending in sector $i$.
+
+\subsection*{Aggregation to the United States and the Rest of the World}
+
+The counterfactual model is solved for two countries, so all country-level data are aggregated to
+the U.S. and a rest-of-world (ROW) aggregate.
+
+\textbf{Additive quantities} (gross output, value added, expenditure, net exports), sum across ROW
+members. Intra-ROW flows cancel, so the ROW's net exports are exactly the negative of the United
+States's.
+
+\textbf{Price levels} are gross-output-weighted geometric means of the member levels within each
+sector and year:
+\begin{equation}
+    \ln P_{i,\text{ROW},t} = \sum_{c \in \text{ROW}} w_{c,t} \ln P_{i,c,t},
+    \qquad
+    w_{c,t} = \frac{Y_{c,t}}{\sum_{c'\in \text{ROW}} Y_{c',t}},
+\end{equation}
+where the weights are computed over members that have a price. This is a mean of levels, so a cheap
+member lowers the aggregate price level.
+
+\subsection*{Recovery after Aggregation}
+
+All model variables are aggregated to the two-country system first, and the structural disturbances
+are recovered from the aggregated data. In particular, the sectoral trade costs that enter the model
+are recovered directly from the aggregated two-country prices and trade shares, sector by sector and
+year by year. The cost paid by importer $i$ to source sector $j$ from exporter $h$ in the
+two-country system is
+\begin{equation}
+    \tau_{ih,t}^{j} = \frac{P_{i,t}^{j}}{P_{h,t}^{j}} \left(\frac{\pi_{hh,t}^{j}}{\pi_{ih,t}^{j}}\right)^{1/\theta},
+    \qquad \tau_{ii,t}^{j} = 1.
+\end{equation}
+By construction the ROW's own share $\pi_{\text{ROW},\text{ROW},t}^{j}$ is one minus the U.S. share of
+ROW spending in sector $j$, since intra-bloc trade is domestic. No member-level parameter is pooled;
+the shared block is the direct inversion of the aggregated data, which is what preserves consistency
+with the two-country model.
+
+\subsection*{Capital Stock}
+
+The capital stock comes from the Penn World Table. The former Soviet republics enter the PWT sample
+only in 1990, so the residual ROW region's capital stock jumps roughly 137\% in a single year (1989
+to 1990) even though investment is flat across the seam. This is a coverage change in the source
+data, not capital accumulation, and leaving it in would put a one-year spike in the recovered
+investment efficiency. The residual region's capital is therefore chain-linked at 1990 the same way
+the aggregates are spliced at 2000: the pre-1990 level is held through 1990, and the series resumes
+with the observed capital stock growth from 1991. Every growth rate after the seam is preserved.
 
 \end{document}
-

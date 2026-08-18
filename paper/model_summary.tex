@@ -1,0 +1,146 @@
+\documentclass[11pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{amssymb}
+\usepackage{caption}
+\captionsetup{font=small,labelfont=bf}
+
+\newcommand{\figpic}[2]{%
+  \begin{center}
+  \includegraphics[width=0.62\textwidth]{#1}
+  \vspace{8pt}
+  {\small #2}
+  \end{center}
+  \vspace{12pt}}
+
+\title{GSC Summary: Recovered Parameters and Model Results}
+\author{}
+\date{\today}
+
+\begin{document}
+\maketitle
+
+\noindent Small figures so the whole project can be talked through. Under each
+figure is a plain-language read of whether the result looks right and, if not,
+why.
+
+\section*{1. Recovered parameters (1965--2014)}
+
+\figpic{../analysis/results/figures/consumption_demand_shifters.pdf}
+  {This looks right. Services demand shifts up in both countries while demand
+  for manufacturing and agriculture is flat to down, which is the standard
+  structural-change pattern the model needs to reproduce.}
+
+\figpic{../analysis/results/figures/trade_costs.pdf}
+  {This looks right for the Rest of the World and flat for the US. Opening trade
+  costs fall substantially, so the globalization channel is present. But the
+  US-facing costs barely move, which is already a warning that freezing trade
+  costs will not do much for the US.}
+
+\figpic{../analysis/results/figures/productivities.pdf}
+  {This looks right, with a caveat. Both countries grow in every sector and the
+  Rest of the World catches up, which is the story we want. But the ROW rise is
+  very large and worth checking against the raw capital and output series
+  before relying on it.}
+
+\figpic{../analysis/results/figures/financial_friction.pdf}
+  {This looks right. The friction is small and gentle, staying close to one in
+  both countries, which is what a wedge that only has to rationalize the
+  observed net foreign asset build-up should look like.}
+
+\figpic{../analysis/results/figures/investment_efficiency.pdf}
+  {This needs a caveat. The tax is now recovered from the capital Euler
+  equation rather than the law of motion, and it rises by roughly a factor of
+  four over the sample. The drift is the model straining: nominal spending per
+  worker grows faster than the discount factor and the measured rental rate can
+  deliver, and the tax absorbs the difference.}
+
+\figpic{../analysis/results/figures/investment_demand_shifters.pdf}
+  {This looks right. The shifters move modestly and are dominated by services,
+  and because they are read off observed investment the gap no longer falls on
+  the consumption shifters. Nothing looks off.}
+
+\section*{2. Model output and counterfactuals}
+
+\noindent The counterfactual freezes bilateral trade costs at their 1965 values
+and lets everything else move as recovered. Two runs: with the financial
+friction active (headline) and with it switched off (robustness). The table
+shows how much of the manufacturing value added decline each run explains over
+the full sample and over the 1970--2007 window the paper reports.
+
+\begin{table}[htbp]
+\centering
+\caption{Trade-cost counterfactual: change in value added shares (pp)}
+\begin{tabular}{lcccc}
+\toprule
+ & \multicolumn{2}{c}{1965--2014} & \multicolumn{2}{c}{1970--2007} \\
+\cmidrule(lr){2-3} \cmidrule(lr){4-5}
+ & Man. & Goods & Man. & Goods \\
+\midrule
+Data                             & $-13.2$ & $-14.8$ & $ -9.9$ & $-11.4$ \\
+Trade costs frozen at 1965       & $-12.0$ & $-13.5$ & $ -7.7$ & $ -9.1$ \\
+\quad share of decline explained & $9.0\%$ & $8.5\%$ & $22.5\%$ & $19.8\%$ \\
+Trade costs frozen, no friction  & $-14.7$ & $-16.7$ & $ -9.4$ & $-11.2$ \\
+\quad share of decline explained & $-11.6\%$ & $-12.9\%$ & $5.4\%$ & $2.1\%$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\figpic{../analysis/results/figures/value_added_shares.pdf}
+  {Look right mechanically. The model's runs hug the data, so it reproduces
+  the structural change it is being asked to explain.}
+
+\figpic{../analysis/results/figures/value_added_gap.pdf}
+  {This needs more thought. Freezing trade costs removes only a small part of
+  the manufacturing decline, so the headline channel explains little -- and
+  how much it explains depends heavily on which years we look at.}
+
+\figpic{../analysis/results/figures/trade_imbalances.pdf}
+  {This looks right. With the friction the model traces the observed imbalance
+  path; without it the path is basically flat, so this is the channel doing the
+  work.}
+
+\figpic{../analysis/results/figures/tradecost.pdf}
+  {This looks right and confirms the trade-cost figure above: costs fall for
+  the Rest of the World and stay put for the US, so freezing them changes
+  little for the American economy.}
+
+\medskip
+
+\noindent \textbf{Net reading.} The model works, but the headline result is
+weak. Trade costs account for at most a quarter of the manufacturing decline,
+and the direction can even flip depending on the window and whether the
+friction is included.
+
+\section*{3. Outstanding questions}
+
+\begin{enumerate}
+\item \textbf{Do tradeable services count as goods?} The baseline keeps
+wholesale, retail and hotels/restaurants in services and includes government
+consumption. Moving wholesale and retail (and hotels and restaurants, which
+the pre-2000 tables cannot separate) into goods and dropping government shifts
+a large share of US consumption out of services and into manufacturing,
+bringing services closer to the share the national accounts report. Under that
+definition the recovered demand shifters change ordering -- manufacturing
+starts above services and the two converge rather than diverge, matching the
+2017 draft. Decide which sector definition is the right one.
+
+\item \textbf{Things that may still be broken, in no particular order.}
+\begin{itemize}
+  \item The trade-cost answer is weak and window-dependent, and can flip sign
+  when the friction is switched off. That may be a real finding, but it should
+  be understood before it goes in the paper -- is it the flat US-facing costs,
+  or the friction interacting with the frozen costs?
+  \item The Rest of the World productivity rise is very large over fifty
+  years; check it is not an artifact of the capital splice, the deflation, or
+  the exchange-rate anchor.
+  \item The recovered world interest rate is nearly flat. Confirm it matches
+  the target we actually want to hit.
+  \item After the exchange-rate fix the price-level ratio between the two
+  regions moves in a reasonable band; recheck once more that the anchor is
+  doing what it should for the level of trade costs.
+\end{itemize}
+\end{enumerate}
+
+\end{document}

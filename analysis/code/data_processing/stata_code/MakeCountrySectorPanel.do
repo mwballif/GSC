@@ -186,23 +186,27 @@ merge 1:m country year sector using `ownprice'
 drop if _merge != 3
 drop _merge
 
+* Hold the exchange rate at its 2005 value so Long Run prices move only with
+* relative prices
+gen xr_05 = xr if year == 2005
+bysort country: egen xr05 = max(xr_05)
+drop xr_05
+
 * Convert the 2016 release from national currency to USD.
 replace go = go / xr if source == 1
 replace va = va / xr if source == 1
 replace ii = ii / xr if source == 1
 
-* Convert the Long Run price index from USD to local currency, matching the
-* 2016 release index.
-replace go_pi = go_pi * xr if source == 0
+* Convert the Long Run price index from USD to local currency at the fixed
+* 2005 rate, matching the 2016 release index.
+replace go_pi = go_pi * xr05 if source == 0
 
 * Chain-link the series that have no accounting identity to preserve.
-*
-/* NOTE: the trade quantities are not spliced here; they come from the matrix. */
+
 local vars "go go_pi va ii va_wiot consump invest"
 
 * Compute the WIOD growth rates.
-*
-/* NOTE: source must be in the sort, or the 2000 rows tie. */
+
 sort country sector year source
 foreach var of local vars {
     by country sector: gen `var'_gr = `var'/`var'[_n-1] if source == 1 & year != 2000
@@ -250,8 +254,8 @@ di as txt "  world net exports, max |sum_i NX_i| = " as res %12.4f max(abs(r(min
 restore
 drop _idgap
 
-* xr is kept for PART 8.
-keep country year sector xr `vars' nx go_wiot expend imports exports
+* xr and xr05 are kept for PART 8.
+keep country year sector xr xr05 `vars' nx go_wiot expend imports exports
 
 *--- PART 7: anchor the price index to 2005 ------------------------------------
 
@@ -274,8 +278,7 @@ rename countrycode country
 merge 1:1 country ppp_sector using `ppp_weights', keep(3) nogen
 
 * Take a gross-output-weighted average PPP for each broad sector.
-*
-/* NOTE: weights are renormalized over subsectors that have a PPP. */
+* NOTE: weights are renormalized over subsectors that have a PPP. */
 bysort country sector: egen ppp_wtot = total(cond(!missing(PPP_y), ppp_weight, .))
 gen ln_ppp_w = ln(PPP_y) * ppp_weight / ppp_wtot
 collapse (sum) ln_ppp_w, by(country sector)
@@ -295,13 +298,12 @@ restore
 /* NOTE: keep(1 3) keeps the residual region, which has no price. */
 merge 1:1 country sector year using `ppp_05', keep(1 3) nogen
 
-* Form the price level in current USD, relative to USA 2005 = 1. go_pi is the
-* within-country index (2005 = 1, local currency), ppp is the 2005 gross output
-* PPP and xr the nominal exchange rate, both local currency per USD. For the USA
-* ppp and xr are one, so this reduces to go_pi.
-gen go_lvl = go_pi * ppp / xr
+* go_pi is an index (2005 = 1), ppp the 2005 gross output PPP, both local
+* currency per USD. xr05 (the 2005 rate, set in PART 6) makes the level common-
+* currency. For the USA both are one, so this reduces to go_pi.
+gen go_lvl = go_pi * ppp / xr05
 
-drop go_pi_05fill ln_ppp_w xr
+drop go_pi_05fill ln_ppp_w xr05 xr
 
 *--- PART 9: save the 25-region panel ------------------------------------------
 
@@ -314,8 +316,6 @@ export delimited "../../../data/processed/CountrySectorPanel.csv", replace
 * within each year.
 *
 /* NOTE: gross exports and imports are dropped; intra-ROW trade is domestic here. */
-/* NOTE: prices are a mean of LEVELS, not changes, so a cheap entrant lowers the index. */
-/* NOTE: go_pi is a local currency index; its cross-country mean is meaningless. */
 
 preserve
 keep if country == "USA"

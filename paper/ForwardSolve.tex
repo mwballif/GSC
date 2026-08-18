@@ -3,6 +3,7 @@
 \usepackage{amssymb}
 \usepackage{booktabs}
 \usepackage{geometry}
+\usepackage{algorithm} \usepackage{algpseudocode}
 \usepackage[expansion=false]{microtype}
 \usepackage{enumitem}
 \geometry{margin=1in}
@@ -12,165 +13,157 @@
 \setlength{\abovedisplayshortskip}{2pt}
 \setlength{\belowdisplayshortskip}{2pt}
 \newcommand{\hd}[1]{\widehat{#1}}
-\newcommand{\st}[1]{\medskip\noindent\textbf{#1}\ }
+\newcommand{\st}[1]{\medskip\noindent#1\ }
 \title{\textbf{Forward Solve}}
 \author{}
 \date{}
+
 \begin{document}
 \maketitle
 \vspace{-3.5em}
-\noindent Two countries $i\in\{US,R\}$, three sectors $j$, years $t=1,\dots,T$.
-%=======================================================
-\section*{ Baseline }
-%=======================================================
-\st{1. Value added.}
-\begin{align}
-  VA_{i,t}=\sum_j\beta^j_iY^j_{i,t}
-\end{align}
-\st{2. Consumption expenditure and the investment rate.}
-\begin{align}
-  E^C_{i,t}=VA_{i,t}-E^X_{i,t}-NX_{i,t},
-  \qquad
-  x_{i,t}=E^X_{i,t}/VA_{i,t}
-\end{align}
-\st{3. Consumption shares.}
-\begin{align}
-  s^j_{i,t}=\frac{E^j_{i,t}-\sum_m\nu^{m,j}_i\big(1-\beta^m_i\big)Y^m_{i,t}
-  -\upsilon^j_iE^X_{i,t}}{E^C_{i,t}}
-\end{align}
-\st{4. Phitilde, how much consumption a dollar buys.}
-\begin{align}
-  \widetilde{\phi}_{i,t}=\Big(\sum_j\varepsilon^js^j_{i,t}\Big)^{-1}
-\end{align}
-\st{5. World interest rate,} for $t=1,\dots,T-1$.
-\begin{align}
-  R_{t+1}=\frac{1}{\delta}\cdot\frac{E^C_{R,t+1}}{E^C_{R,t}}\cdot
-  \frac{L_{R,t}}{L_{R,t+1}}\cdot\frac{\widetilde{\phi}_{R,t}}{\widetilde{\phi}_{R,t+1}}
-\end{align}
-\st{6. The wedge,} for $t=1,\dots,T-1$. ROW's is one.
-\begin{align}
-  \omega_{US,t}=\frac{L_{US,t+1}}{L_{US,t}}\cdot
-  \frac{\widetilde{\phi}_{US,t+1}}{\widetilde{\phi}_{US,t}}\cdot\delta R_{t+1}\cdot
-  \frac{E^C_{US,t}}{E^C_{US,t+1}}
-\end{align}
-\st{7. Bonds.} Start from $B_{i,1}=0$.
-\begin{align}
-  B_{i,t+1}=R_tB_{i,t}+NX_{i,t}
-\end{align}
-%=======================================================
-\section*{Inner Loop (static year)}
-%=======================================================
-\noindent Input: year $t$ and US net exports $NX'_{US,t}$
-$NX'_{R,t}=-NX'_{US,t}$.
 
-\st{8. Guess the change in the US wage,} $\hd{w}_{US}$. Set $\hd{w}_R=1$. 
 
-\st{9. Unit costs and prices.} Start at $\hd{P}=1$ and alternate the two until they stop moving.
-\begin{align}
-  \hd{c}^j_i=\big(\hd{w}_i\big)^{\beta^j_i}\prod_m\big(\hd{P}^m_i\big)^{\nu^{j,m}_i(1-\beta^j_i)},
-  \qquad
-  \hd{P}^j_i=\Big[\sum_h\pi^j_{ih,t}\big(\hd{c}^j_h\big)^{-\theta}\Big]^{-1/\theta}
-\end{align}
-\st{10. Trade shares.}
-\begin{align}
-  \pi'^j_{ih}=\pi^j_{ih,t}\left(\frac{\hd{c}^j_h}{\hd{P}^j_i}\right)^{-\theta}
-\end{align}
-\st{11. Income and spending.}
-\begin{align}
-  VA'_i=VA_{i,t}\hd{w}_i,
-  \qquad
-  E^{X\prime}_i=x_{i,t}VA'_i,
-  \qquad
-  E^{C\prime}_i=\big(1-x_{i,t}\big)VA'_i-NX'_i
-\end{align}
-\st{12. Real consumption.} Solve for $\hd{C}_i$, one country at a time, where
-$\hd{E}^C_i=E^{C\prime}_i/E^C_{i,t}$.
-\begin{align}
-  \hd{C}_i\left[\sum_js^j_{i,t}\big(\hd{P}^j_i\big)^{1-\psi}
-  \hd{C}_i^{\,(1-\psi)(\varepsilon^j-1)}\right]^{\frac{1}{1-\psi}}=\hd{E}^C_i
-\end{align}
-\st{13. New consumption shares.} The bracket above, to the same power, is $\hd{P}^C_i$.
-\begin{align}
-  s'^j_i=s^j_{i,t}\left(\frac{\hd{P}^j_i}{\hd{P}^C_i}\right)^{1-\psi}
-  \hd{C}_i^{\,(1-\psi)(\varepsilon^j-1)}
-\end{align}
-\st{14. Market clearing.} Six slots, ordered $(a,US),(a,R),(m,US),(m,R),(s,US),(s,R)$.
-\begin{align}
-  F_{(j,i)}=s'^j_iE^{C\prime}_i+\upsilon^j_iE^{X\prime}_i,
-  \quad
-  \Gamma_{(j,i),(m,i)}=\nu^{m,j}_i\big(1-\beta^m_i\big),
-  \quad
-  \Pi'_{(j,i),(j,h)}=\pi'^j_{hi}
-\end{align}
-\begin{align}
-  E'=\big[I-\Gamma\Pi'\big]^{-1}F,
-  \qquad
-  Y'=\Pi'E'
-\end{align}
-\st{15. Income residual.} If this is not zero, go back to step 8.
-\begin{align}
-  g=\frac{\sum_j\beta^j_{US}Y'^j_{US}}{VA_{US,t}\,\hd{w}_{US}}-1
-\end{align}
-%=======================================================
-\section*{ Outter Loop (Dynamic)} 
-%=======================================================
-\noindent Input: wedge path $\omega_{US,t}$.
-\st{16. Guess the whole path} $\{NX'_{US,t}\}_{t=1}^{T}$. Start at the observed one.
 
-\st{17. Every year.} Run inner loop at each $t$, collect $E^{C\prime}_{i,t}$ and the new
-shares, then recompute step 4 from those shares.
+\begin{algorithm}[h]
+\caption{}
+\begin{algorithmic}[1]
+\State \textbf{Solve} the terminal steady state.
+\State \textbf{Guess} two paths: $\{K_{i,t}\}$ and $\{NX_{i,t}\}$
+\Repeat
+  \State Solve the static problem in every year.
+  \State Accumulate bonds forward.
+  \State Check if consumption Euler holds in each year
+  \State Chekc if Capital Euler each year, at the recovered $\chi_{i,t}$.
+  \State Terminal conditions: steady states.
+  \State Update the guess.
+\Until{convergence}
+\end{algorithmic}
+\end{algorithm}
 
-\st{18. World interest rate,} step 5 again, on the new consumption path.
+%=======================================================
+\section*{1. Solve steady State }
+%=======================================================
 
-\st{19. Bonds,} step 7 again, on the guessed net exports and the new interest rates.
+\st{Consumption Euler}
+\begin{align}
+1=\frac{\delta R_{ss}}{1+\phi_{i,ss}\big(\bar{B}_i-\bar{B}_i\big)}
+\qquad\Longrightarrow\qquad
+R_{ss}=\frac{1}{\delta}
+\end{align}
 
-\st{20. US saving equation.} For $t=1,\dots,T-1$,
+
+\st{Bond NX identity}
 \begin{align}
-  \mathcal{R}_t=\ln\frac{E^{C\prime}_{US,t+1}}{E^{C\prime}_{US,t}}
-  -\ln\frac{L_{US,t+1}}{L_{US,t}}
-  -\ln\frac{\widetilde{\phi}_{US,t+1}}{\widetilde{\phi}_{US,t}}
-  -\ln\frac{\delta R'_{t+1}}{\omega_{US,t}},
+B_{i,t+1}-B_{i,t}=NX_{i,t}+\big(R_t-1\big)B_{i,t}
+\qquad\Longrightarrow\qquad
+NX_{i,ss}=-\Big(\tfrac{1}{\delta}-1\Big)\bar{B}_i
 \end{align}
-\st{21. Terminal condition,} so the counterfactual ends where the baseline did.
+
+
+\st{Capital Euler}
 \begin{align}
-  \mathcal{R}_T=\frac{B'_{US,T+1}-B_{US,T+1}}{VA_{US,T}}.
+\frac{P^X_{i,ss}}{\delta}=r_{i,ss}+(1-d)P^X_{i,ss}
+\qquad\Longrightarrow\qquad
+\frac{r_{i,ss}}{P^X_{i,ss}}=\frac{1}{\delta}-(1-d)
 \end{align}
-\st{22. Newton solver}
-%=======================================================
-\section*{Counterfactual}
-%=======================================================
-\st{23. Run counterfactual once at the wedge from step 6, once with the wedge set to one and compare manufacturing's share of value added}
+
+\st{Capital accumulation}
 \begin{align}
-  va^j_{i,t}=\frac{\beta^j_iY'^j_{i,t}}{\sum_m\beta^m_iY'^m_{i,t}},
-  \qquad
-  \text{answer}=1-\frac{\Delta va^{m,\text{CF}}_{US}}{\Delta va^{m,\text{base}}_{US}},
+K_{i,t+1}=X_{i,t}+(1-d)K_{i,t}
+\qquad\Longrightarrow\qquad
+X_{i,ss}=d\,K_{i,ss}
 \end{align}
 %=======================================================
-\section*{Input sources}
+\section*{2. Static }
 %=======================================================
-\begin{center}
-\small
-\setlength{\tabcolsep}{5pt}
-\begin{tabular}{lll}
-\toprule
-& Meaning & Column \\
-\midrule
-$\beta^j_i$ & value added share of output & \texttt{recovered\_constants.beta} \\
-$\upsilon^j_i$ & investment shares & \texttt{recovered\_constants.upsilon} \\
-$\nu^{j,m}_i$ & sector $j$'s spending share on good $m$ & \texttt{recovered\_nu.nu} \\
-$\pi^j_{ih,t}$ & buyer $i$'s share sourced from seller $h$ & \texttt{ImpExpSectorPanel.imp\_sh} \\
-$Y^j_{i,t}$ & gross output & \texttt{CountrySectorPanel.go\_wiot} \\
-$E^j_{i,t}$ & sectoral expenditure & \texttt{CountrySectorPanel.expend} \\
-$E^X_{i,t}$ & investment & \texttt{CountryPanel.tot\_invest} \\
-$NX_{i,t}$ & net exports & \texttt{CountryPanel.tot\_nx} \\
-$L_{i,t}$ & employment & \texttt{CountryPanel.emp} \\
-\midrule
-$\theta=4$ & trade elasticity & \\
-$\psi=0.57$ & consumption elasticity & \\
-$\delta=0.95$ & discount factor & \\
-$\varepsilon^j$ & income elasticities & $(0.0091,\,0.4566,\,0.5342)$ 
-\\
-\bottomrule
-\end{tabular}
-\end{center}
+\noindent Input: the year's disturbances, the capital stocks $K_{i,t}$ and $K_{i,t+1}$, and
+net exports $NX_{i,t}$.
+ 
+\st{Guess the wage.}
+\begin{align}
+w_{i,t}
+\end{align}
+
+
+\st{Recover the rental rate from the capital--labor ratio, using
+$r_{i,t}K_{i,t}=\varphi_iVA_{i,t}$ and $w_{i,t}L_{i,t}=(1-\varphi_i)VA_{i,t}$.}
+\begin{align}
+\frac{w_{i,t}}{r_{i,t}}=\frac{1-\varphi_i}{\varphi_i}\cdot\frac{K_{i,t}}{L_{i,t}}
+\end{align}
+
+
+\st{Obtain unit costs and solve for sectoral prices via system of equations}
+\begin{align}
+c^j_{i,t}=\varkappa^j_i\Big[\big(r_{i,t}^{\varphi_i}w_{i,t}^{1-\varphi_i}\big)^{\beta^j_i}
+\prod_{k\in\mathcal{J}}\big(P^k_{i,t}\big)^{\nu^{j,k}_i(1-\beta^j_i)}\Big],
+\qquad
+P^j_{i,t}=\Gamma\big[\Phi^j_{i,t}\big]^{-1/\theta},
+\quad
+\Phi^j_{i,t}=\sum_h T^j_{h,t}\big(c^j_{h,t}\tau^j_{ih,t}\big)^{-\theta}
+\end{align}
+
+
+\st{Construct trade shares.}
+\begin{align}
+\pi^j_{ih,t}=\frac{T^j_{h,t}\big(c^j_{h,t}\tau^j_{ih,t}\big)^{-\theta}}{\Phi^j_{i,t}}
+\end{align}
+
+
+\st{Investment from the guessed capital stocks}
+\begin{align}
+X_{i,t}=K_{i,t+1}-(1-d)K_{i,t},
+\qquad
+P^X_{i,t}=\Big[\sum_j\mu^{x,j}_{i,t}\big(P^j_{i,t}\big)^{1-\zeta}\Big]^{\frac{1}{1-\zeta}},
+\qquad
+E^X_{i,t}=P^X_{i,t}X_{i,t}
+\end{align}
+
+
+\st{Consumption expenditure is what is left of value added.}
+\begin{align}
+VA_{i,t}=w_{i,t}L_{i,t}+r_{i,t}K_{i,t},
+\qquad
+E^C_{i,t}=VA_{i,t}-E^X_{i,t}-NX_{i,t}
+\end{align}
+
+
+\st{Solve for real consumption. $P^C$ depends on $C_{i,t}/L_{i,t}$, so this is implicit.}
+\begin{align}
+E^C_{i,t}=P^C_{i,t}C_{i,t},
+\qquad
+P^C_{i,t}=\Big[\sum_j\mu^{c,j}_{i,t}
+\big(C_{i,t}/L_{i,t}\big)^{(1-\psi)(\varepsilon^j-1)}
+\big(P^j_{i,t}\big)^{1-\psi}\Big]^{\frac{1}{1-\psi}}
+\end{align}
+
+
+\st{Sectoral final demands.}
+\begin{align}
+s^j_{i,t}=\mu^{c,j}_{i,t}\left(\frac{P^j_{i,t}}{P^C_{i,t}}\right)^{1-\psi}
+\left(\frac{C_{i,t}}{L_{i,t}}\right)^{(1-\psi)(\varepsilon^j-1)},
+\qquad
+x^j_{i,t}=\mu^{x,j}_{i,t}\left(\frac{P^j_{i,t}}{P^X_{i,t}}\right)^{1-\zeta}
+\end{align}
+
+
+\st{Build expenditure from its three uses and output from the trade shares. Iterate the two
+until they stop moving.}
+\begin{align}
+E^j_{i,t}=s^j_{i,t}E^C_{i,t}+x^j_{i,t}E^X_{i,t}
++\sum_{m\in\mathcal{J}}\big(1-\beta^m_i\big)\nu^{m,j}_iY^m_{i,t},
+\qquad
+Y^j_{i,t}=\sum_h\pi^j_{hi,t}E^j_{h,t}
+\end{align}
+
+
+\st{Sectoral net exports.}
+\begin{align}
+NX^j_{i,t}=Y^j_{i,t}-E^j_{i,t}
+\end{align}
+ 
+\st{ If this does not hold, go back and update the wage.}
+\begin{align}
+\sum_{j\in\mathcal{J}}NX^j_{i,t}=NX_{i,t}
+\end{align}
+
 \end{document}

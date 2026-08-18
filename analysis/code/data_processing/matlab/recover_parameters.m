@@ -1,95 +1,62 @@
-%==============================================================================
-% recover_parameters.m
-%
-% Purpose: Recover the model's disturbances from the two-country panels: demand
-%          shifters mu, unit costs c, trade costs tau, productivities T, the
-%          financial friction, and the investment efficiency shifter chi.
-% Reads:   the three _2country panels, panel_B.csv, panel_D.csv, the crosswalks
-% Writes:  recovered_parameters.csv, recovered_constants.csv, recovered_nu.csv,
-%          recovered_friction.csv, recovered_invshares.csv,
-%          recovered_world_rate.csv, recovered_consumption.csv
-%
-% Follows Reyes-Heroles, "Globalization and Structural Change in the United
-% States", with the four changes in PROJECT_SPEC.md: reparameterized CES
-% aggregator, tradable services, extended sample, and the financial friction in
-% place of the intertemporal preference shifter. Every equation implemented here
-% is labelled with its tag in paper/math_appendix.tex.
-%
-% NOTE: never name a loop counter d. It is the depreciation rate.
-%==============================================================================
-
+% recover model parameters
 clear
-
 datapath = '../../../data/processed/';
 cwpath   = '../../../data/crosswalks/';
+rawpath  = '../../../data/raw/';
 
-%% Set calibrated parameters
-% NOTE: these must match model/parameters.m.
-theta = 4;                          % Trade elasticity
-psi   = 0.57;                       % Price elasticity of demand
-% Sectoral income elasticities [AGR MAN SER], Comin-Lashkari-Mestieri (2021).
-% They normalize manufacturing to one; this model normalizes the sum to one.
-%
-% DO NOT "translate" these into the paper's units. The appendix aggregator is
-% CLM's own functional form: their eq (1) puts the exponent eps*(1-sigma)/sigma
-% on real consumption, their eq (3) expenditure function gives price index
-% exponent (1-sigma)(eps-1), and their relative demand elasticity is
-% (1-sigma)(eps_i - eps_j) -- all three match eq:aggregator, eq:priceindex and
-% eq:demand-raw exactly. So CLM's published values belong here untranslated.
-% The PAPER's eqs (4), (6), (7) are the reparameterized ones, with
-% eps_paper = (1-psi)*eps_CLM + psi; its epsilons are therefore NOT comparable
-% to these, and converting CLM into paper units and back would put a negative
-% value on agriculture, which CLM's own eps > 0 restriction rules out.
-%
-% NOTE: at a FIXED kappa the choice is irrelevant, exactly as the appendix says
-% under eq:aggregator: rescaling every eps by a common factor is absorbed by the
-% units of C, since the kappa equation moves C by the reciprocal power. Verified
-% to 2e-14. It matters here only because kappa_source below is 'pwt_anchor',
-% which makes kappa itself a function of eps; on that path switching the
-% normalization moves mu by up to three orders of magnitude and flips the cross
-% sector ranking. Set kappa numerically to recover the invariance.
+% calibrated parameters
+theta = 2;
+psi   = 0.57;
+
+% normalize income elasticities to sum to 1
 eps_norm = 'sum1';
 eps_clm  = [0.02 1.0 1.17];
 switch eps_norm
-    case 'sum1', eps = eps_clm / sum(eps_clm);   %[0.0091 0.4566 0.5342]
+    case 'sum1', eps = eps_clm / sum(eps_clm);   
     case 'clm',  eps = eps_clm;
     otherwise,   error('eps_norm must be sum1 or clm')
 end
-zeta  = 1;                          %investment elasticity
-eta   = 2;                          %within sector elasticity
-delta = 0.95;                       %discount factor
-d     = 0.05;                       %depreciation rate
-% Capital adjustment cost parameter, sigma. Zero is the paper's calibration:
-% adjustment costs are infinite.
-%
-% NOTE: at sigma = 0 investment drops out and chi is just capital growth.
-sigma = 0;
-Gam   = gamma((theta+1-eta)/theta)^(1/(1-eta));   %EK constant
 
-%% Set the capital share in value added, phi
-% From Caselli and Feyrer (2007) Table II. alpha_w is the total capital share;
-% alpha_k nets out land and resource rents.
-%
-% NOTE: K is PWT reproducible capital, so alpha_k is the consistent pairing.
+zeta  = 1;                          % investment elasticity, Atalay (2015)
+eta   = 2;
+delta = 0.95;
+d     = 0.05;
+Gam   = gamma((theta+1-eta)/theta)^(1/(1-eta));   % EK constant
+
+% capital stock anchor. The law of motion is iterated forward from the PWT
+% stock in this year (eq:kpath). The appendix anchors at 1970, matching the
+% paper's sample start; at 1965 the sample's first year is the anchor and no
+% backward step is needed. Anchoring later moves the whole capital level,
+% hence the rental rate, unit costs, productivities and trade costs.
+k_anchor_year = 1965;
+
+% net foreign asset position of the US in the first year, in USD millions,
+% and the friction's baseline position. Bonds are in zero net supply, so ROW
+% takes the mirror image of both (eq:bmirror).
+% NOTE: the wedge is algebraically invariant to both; only phi's level moves.
+B1965_USA = 0;
+Bbar_USA  = 0;
+
+% compute VA-weighted capital share (phi)
 phi_measure = 'alpha_w';
-
 cf  = readtable(strcat(cwpath, 'capital_shares_cf2007.csv'));
 cwk = readtable(strcat(cwpath, 'country_num_crosswalk.csv'));
+
 cf_ctry  = string(cf.country);
 cwk_ctry = string(cwk.country);
 cf_phi   = cf.(phi_measure);
 
-% Aggregate phi to ROW as a value-added-weighted mean of member shares. Weights
-% are mean annual value added per country from panel_B.
 pb_w = readtable(strcat(datapath, 'panel_B.csv'));
 pb_w = pb_w(~(pb_w.year == 2000 & pb_w.source == 1), :);
 
 nC     = height(cwk);
-va_i   = zeros(nC,1);      %mean annual value added by country
-phi_i  = nan(nC,1);        %CF share by country, NaN where unavailable
+va_i   = zeros(nC,1);
+phi_i  = nan(nC,1);
+
 for k = 1:nC
     rows    = pb_w.country == cwk.country_numcode(k);
     va_i(k) = sum(pb_w.va(rows)) / numel(unique(pb_w.year(rows)));
+    
     hit     = find(cf_ctry == cwk_ctry(k), 1);
     if ~isempty(hit), phi_i(k) = cf_phi(hit); end
 end
@@ -101,9 +68,7 @@ phi    = zeros(2,1);
 phi(1) = cf_phi(cf_ctry == "USA");
 phi(2) = sum(phi_i(use) .* va_i(use)) / sum(va_i(use));
 
-% Warn about coverage.
-%
-% NOTE: uncovered countries get the covered countries' weighted mean.
+% coverage diagnostics
 cover = 100 * sum(va_i(use)) / sum(va_i(is_row));
 fprintf('phi from Caselli-Feyrer %s: USA %.3f, ROW %.3f (ROW covers %.0f%% of non-US value added)\n', ...
         phi_measure, phi(1), phi(2), cover);
@@ -115,29 +80,27 @@ if cover < 75
     fprintf('\n');
 end
 
-%% load two country panels (USA vs ROW aggregate)
-cs = readtable(strcat(datapath, 'CountrySectorPanel_2country.csv'));   %country sector output and prices
-cp = readtable(strcat(datapath, 'CountryPanel_2country.csv'));         %country aggregates
-bp = readtable(strcat(datapath, 'ImpExpSectorPanel_2country.csv'));    %bilateral trade
-
-% panel_D carries both releases; the splice below needs the 2000 row of each.
+% load data panels
+cs = readtable(strcat(datapath, 'CountrySectorPanel_2country.csv'));
+cp = readtable(strcat(datapath, 'CountryPanel_2country.csv'));
+bp = readtable(strcat(datapath, 'ImpExpSectorPanel_2country.csv'));
 io = readtable(strcat(datapath, 'panel_D.csv'));
-usa_code = 24;
 
+usa_code = 24;
 years = 1965:2014;
 Ty = numel(years);
 secs = {'AGR','MAN','SER'};
 J = 3;
 cnames = {'USA','ROW'};
 
-%% read country sector panel
-GO   = zeros(2,J,Ty);    %nominal gross output
-VA   = zeros(2,J,Ty);    %value added
-EXPD = zeros(2,J,Ty);    %sector expenditure
-CE   = zeros(2,J,Ty);    %consumption expenditure
-XE   = zeros(2,J,Ty);    %investment expenditure
-P    = zeros(2,J,Ty);    %sector price level
-NXS  = zeros(2,J,Ty);    %sectoral net exports, as stored (audited below)
+% extract nominal sectoral variables
+GO   = zeros(2,J,Ty);
+VA   = zeros(2,J,Ty);
+EXPD = zeros(2,J,Ty);
+CE   = zeros(2,J,Ty);
+XE   = zeros(2,J,Ty);
+P    = zeros(2,J,Ty);
+NXS  = zeros(2,J,Ty);
 
 for i = 1:2
     for j = 1:J
@@ -154,32 +117,45 @@ for i = 1:2
     end
 end
 
-%% read country panel
-GDP = zeros(2,Ty);   %gdp
-L   = zeros(2,Ty);   %employment
-K   = zeros(2,Ty);   %capital stock
-PC  = zeros(2,Ty);   %consumption price
-PX  = zeros(2,Ty);   %investment price
+% extract country-level aggregates
+GDP    = zeros(2,Ty);
+L      = zeros(2,Ty);
+K      = zeros(2,Ty);
+PC     = zeros(2,Ty);
+PX_pwt = zeros(2,Ty);
 
 for i = 1:2
     for t = 1:Ty
         row = strcmp(cp.country, cnames{i}) & cp.year == years(t);
-        GDP(i,t) = cp.gdp(row);
-        L(i,t)   = cp.emp(row);
-        K(i,t)   = cp.k_stock(row);
-        PC(i,t)  = cp.consump_pi(row);
-        PX(i,t)  = cp.invest_pi(row);
+        GDP(i,t)    = cp.gdp(row);
+        L(i,t)      = cp.emp(row);
+        K(i,t)      = cp.k_stock(row);
+        PC(i,t)     = cp.consump_pi(row);
+        PX_pwt(i,t) = cp.invest_pi(row);
     end
 end
 
-%% read import shares
-%pi_mat(im,ex) is share of importer im expenditure sourced from exporter ex
-%
-%The destination index is im, not d: d is the depreciation rate set above and
-%a loop counter named d silently overwrote it, leaving 1-d = -1 in the chi
-%block downstream.
-pi_mat = zeros(2,2,J,Ty);
+% read the world interest rate: the gross yield on the 10-year US Treasury
+% note, R_t = 1 + i_t/100 (FRED DGS10, annual averages). Bonds are in zero
+% net supply, so both countries face the same R_t, which is why neither
+% country's friction has to be normalized below.
+dgs   = readtable(strcat(rawpath, 'DGS10.csv'));
+dgs_d = dgs.observation_date;
+if ~isdatetime(dgs_d)
+    dgs_d = datetime(string(dgs_d), 'InputFormat', 'yyyy-MM-dd');
+end
+dgs_y = year(dgs_d);
 
+R_obs = nan(1,Ty);
+for t = 1:Ty
+    hit = find(dgs_y == years(t), 1);
+    assert(~isempty(hit), 'DGS10.csv has no observation for %d', years(t))
+    R_obs(t) = 1 + dgs.DGS10(hit)/100;
+end
+assert(all(R_obs > 1), 'the Treasury yield is not strictly positive in every year')
+
+% extract bilateral import shares
+pi_mat = zeros(2,2,J,Ty);
 for im = 1:2
     for ex = 1:2
         for j = 1:J
@@ -192,26 +168,17 @@ for im = 1:2
     end
 end
 
-%% read input-output flows, chain-linked at 2000
-%IOF(i,j,m,t) is spending by country i's sector j (using) on inputs from
-%sector m (source), summed over every source country.
-%
-%panel_D never passes through the Stata stage, so the 2000 splice has to
-%happen here. Read raw, its post-2000 rows are R16 levels while every other
-%quantity in the panel has been chain-linked onto the LR 2000 level. The two
-%bases are not comparable and the WIOT identity
-%    E^j = P^jC^j + P^jX^j + sum_m P^jD^{m,j}
-%then fails in all 14 post-2000 years (by up to 17.6% in ROW agriculture)
-%while holding exactly in all 36 years before. Splice rule is the same one
-%the panels use: LR levels through 2000, R16 growth rates after.
-IOF  = zeros(2,J,J,Ty);     %spliced
-IO_R = zeros(2,J,J,Ty);     %raw R16 levels, 2000-2014 only
+% splice IO flows (LR to R16)
+IOF  = zeros(2,J,J,Ty);
+IO_R = zeros(2,J,J,Ty);
+
 for j = 1:J
     for m = 1:J
         for t = 1:Ty
             rows = io.sector == j & io.source_sector == m & io.year == years(t);
             lr   = rows & io.source == 0;
             r16  = rows & io.source == 1;
+            
             IOF(1,j,m,t)  = sum(io.io_flow(lr  & io.country == usa_code));
             IOF(2,j,m,t)  = sum(io.io_flow(lr  & io.country ~= usa_code));
             IO_R(1,j,m,t) = sum(io.io_flow(r16 & io.country == usa_code));
@@ -225,18 +192,11 @@ for t = t00+1:Ty
     IOF(:,:,:,t) = IOF(:,:,:,t-1) .* (IO_R(:,:,:,t) ./ IO_R(:,:,:,t-1));
 end
 
-%Column identity behind eq:interm in the math appendix: sector j's total
-%intermediate purchases, sum_m D^{j,m}, must equal GO^j - VA^j. When it holds,
-%the closed form (1-beta) nu Y evaluated at year-t shares equals the measured
-%flows exactly, which is why the mu recovery below uses the flows; at the
-%calibrated time-invariant shares the closed form misses the flows by tens of
-%percent and would push mu^AGR negative, so it is never used. Passes at the 1%
-%level before 2000; the post-2000 gap is the IO splice, which rescales flows
-%by R16 growth rates while GO and VA are spliced separately.
+% validate IO column identity
 fprintf('Column identity, sum_m D^{j,m} vs GO^j - VA^j (max rel dev):\n');
 for i = 1:2
     for j = 1:J
-        buy = squeeze(sum(IOF(i,j,:,:),3));      %total purchases by sector j
+        buy = squeeze(sum(IOF(i,j,:,:),3));
         tgt = squeeze(GO(i,j,:) - VA(i,j,:));
         dev = abs(buy ./ tgt - 1);
         fprintf('  %-3s %-3s  pre-2000 max %.3f   post-2000 max %.3f\n', ...
@@ -244,34 +204,166 @@ for i = 1:2
     end
 end
 
-%% shares from data
-beta = mean(VA ./ GO, 3, 'omitnan');            %value added share of gross output
-ups  = mean(XE ./ sum(XE,2), 3, 'omitnan');     %investment expenditure shares
+% compute shares
+beta  = mean(VA ./ GO, 3, 'omitnan');
+x_obs = XE ./ sum(XE,2);              % observed investment shares, x^j
+ups   = mean(x_obs, 3, 'omitnan');    % their time average, the paper's constant
 
-%IO shares, row is using (producing) sector, column is source sector, rows
-%sum to 1; time-invariant, so recovered as a time average like beta and ups
-nu_shares = mean(IOF ./ sum(IOF,3), 4, 'omitnan');   %(2 x J x J)
+nu_shares = mean(IOF ./ sum(IOF,3), 4, 'omitnan');
 nu = cell(2,1);
 for i = 1:2
     nu{i} = squeeze(nu_shares(i,:,:));
 end
 
-%% factor prices
-w = (1 - phi) .* GDP ./ L;   %wage
-r = phi .* GDP ./ K;         %rental rate
-
-%% aggregates
-PXX   = squeeze(sum(XE,2));      %total investment expenditure, P^X X
-
-% Aggregate net exports: output minus total expenditure, the one definition.
+% recover the investment demand shifters and the investment price index
+% (eq:mux and eq:PXrecover)
 %
-% NOTE: if a check below fires, the Stata stage is splicing trade separately.
-NX = squeeze(sum(GO,2)) - squeeze(sum(EXPD,2));
+% Investment is homothetic CES, so the observed share x^j = P^jX^j/E^X
+% inverts the share equation directly: mu^{x,j} = x^j (P^j/P^X)^(zeta-1).
+% P^X is not in the data, but imposing sum_j mu^{x,j} = 1 gives it in closed
+% form. At zeta = 1 both collapse to their Cobb-Douglas limits, mu^x = x^j
+% and P^X = prod_j (P^j)^(x^j), which is the index the model's yearmodel.m
+% already uses, now with observed rather than time-averaged weights.
+%
+% The panel's investment column is gross fixed capital formation plus changes
+% in inventories, so a handful of cells are negative, almost all agriculture
+% running its inventories down. The aggregator needs mu^x > 0, so those shares
+% are floored and the rest renormalized. The floor is two orders of magnitude
+% below the smallest positive agricultural share; the diagnostics below say how
+% many cells it binds on and how much expenditure it moves.
+x_floor = 1e-5;
+x_adj   = max(x_obs, x_floor);
+x_adj   = x_adj ./ sum(x_adj, 2);
+nfloor  = squeeze(sum(x_obs < x_floor, 3));
 
+mux = zeros(2,J,Ty);
+PX  = zeros(2,Ty);
+
+for i = 1:2
+    for t = 1:Ty
+        Pv = reshape(P(i,:,t), 1, J);
+        xv = reshape(x_adj(i,:,t), 1, J);
+        if abs(zeta - 1) < 1e-10
+            PX(i,t)    = prod(Pv .^ xv);
+            mux(i,:,t) = xv;
+        else
+            PX(i,t)    = sum(xv .* Pv.^(zeta-1))^(1/(zeta-1));
+            mux(i,:,t) = xv .* (Pv / PX(i,t)).^(zeta-1);
+        end
+    end
+end
+
+assert(all(mux(:) > 0), 'recovered mu^x is not strictly positive')
+assert(max(abs(squeeze(sum(mux,2)) - 1), [], 'all') < 1e-10, ...
+       'normalization sum_j mu^x = 1 failed')
+
+% The investment term in the mu inversion below is now sectoral investment
+% expenditure itself, since mu^{x,j}(P^j/P^X)^(1-zeta) = x^j by construction.
+% Checked here rather than assumed; the gap against the observed column is the
+% floor, nothing else.
+PXX    = squeeze(sum(XE,2));          % investment expenditure, E^X
+XE_mod = mux .* (P ./ reshape(PX,2,1,Ty)).^(1-zeta) .* reshape(PXX,2,1,Ty);
+assert(max(abs(XE_mod ./ (x_adj .* reshape(PXX,2,1,Ty)) - 1), [], 'all') < 1e-10, ...
+       'the recovered investment shifters do not reproduce investment expenditure')
+
+fprintf('\nInvestment block (zeta = %.2f):\n', zeta);
+for i = 1:2
+    for j = 1:J
+        if nfloor(i,j) > 0
+            fprintf(['  %-3s %-3s  share floored at %.0e in %2d of %d years, ' ...
+                     'max share moved %.4f\n'], cnames{i}, secs{j}, x_floor, ...
+                    nfloor(i,j), Ty, max(abs(x_adj(i,j,:) - x_obs(i,j,:))));
+        end
+    end
+end
+fprintf('  investment expenditure vs the observed column: max gap %.2e of E^X\n', ...
+        max(abs(XE_mod - XE) ./ reshape(PXX,2,1,Ty), [], 'all'));
+for i = 1:2
+    ratio = PX(i,:) ./ PX_pwt(i,:);
+    fprintf(['  %-3s  recovered P^X vs PWT investment price: corr(logs) %+.3f' ...
+             '   ratio range [%.3f %.3f]\n'], cnames{i}, ...
+            corr(log(PX(i,:))', log(PX_pwt(i,:))'), ...
+            min(ratio)/mean(ratio), max(ratio)/mean(ratio));
+    fprintf('  %-3s  mu^x range by sector:', cnames{i});
+    for j = 1:J
+        fprintf('  %s [%.3f %.3f]', secs{j}, min(mux(i,j,:)), max(mux(i,j,:)));
+    end
+    fprintf('\n');
+end
+
+% build the capital stock from the law of motion, anchored at k_anchor_year
+% (eq:kpath)
+%
+% The model has a law of motion as well as a capital Euler, and both have to hold
+% on the same stock, so K is accumulated rather than read from PWT every year.
+% Only one year of the PWT stock is used. Forward, an error in the anchor decays
+% at (1-d)^t; the backward step needed for years before the anchor amplifies it
+% by 1/(1-d) a year, which is why the anchor defaults to the first year.
+%
+% Real investment is now E^X over the RECOVERED P^X, not the PWT price level.
+Xq   = PXX ./ PX;                     % investment quantity, X = E^X/P^X
+
+% The two price indices have different bases, so PWT's real stock has to be
+% revalued before it can anchor a series accumulated from this real flow:
+% nominal it at the PWT investment price, then deflate by the model's own
+% index. Skipping this understates capital by a third and inflates the rental
+% rate by the same factor, which does not cancel in the capital Euler.
+Kdat = K .* PX_pwt ./ PX;
+
+ta = find(years == k_anchor_year);
+assert(~isempty(ta), 'k_anchor_year = %d is outside the sample', k_anchor_year)
+
+Klom = zeros(2,Ty);
+Klom(:,ta) = Kdat(:,ta);
+for t = ta:Ty-1
+    Klom(:,t+1) = (1-d) * Klom(:,t) + Xq(:,t);
+end
+for t = ta-1:-1:1
+    Klom(:,t) = (Klom(:,t+1) - Xq(:,t)) / (1-d);
+end
+assert(all(Klom(:) > 0), 'the accumulated capital stock went non-positive')
+
+% factor prices from the firm's FOCs (eq:rental and its labour counterpart).
+% One rental rate for the whole file: unit costs, the budget constraint and the
+% capital Euler all see this r, and all see the accumulated stock.
+%
+% Value added is the panel's, not the model's sum_j beta^j Y^j reconstruction.
+% The constant shares miss measured value added by up to 5 per cent (US) and
+% 12 per cent (ROW), and putting that error into household income degrades the
+% over-identifying check sum_j N^j/E^C - 1 from about 1 per cent to 6 (US) and
+% 15 (ROW). Verified both ways.
+w = (1 - phi) .* GDP ./ L;
+r = phi .* GDP ./ Klom;
+
+% the model's own value added, for the diagnostic below
+VAm = zeros(2,Ty);
+for i = 1:2
+    VAm(i,:) = sum(beta(i,:)' .* squeeze(GO(i,:,:)), 1);
+end
+
+% Drift against the PWT stock. d = 0.05 is the paper's parameter; the
+% depreciation PWT's own stock and measured investment jointly imply is nearer
+% 0.04 (US) and 0.01 (ROW), so the accumulated series drifts below PWT. Reported
+% rather than fixed: calibrating d per country would absorb splice and coverage
+% error into a technology parameter.
+fprintf('\nCapital block:\n');
+for i = 1:2
+    gK   = Klom(i,:) ./ Kdat(i,:) - 1;
+    dimp = 1 - (Kdat(i,2:end) - Xq(i,1:end-1)) ./ Kdat(i,1:end-1);
+    fprintf('  %-3s  K vs the revalued PWT stock: 1990 %+.0f%%, 2014 %+.0f%%   implied d mean %.3f\n', ...
+            cnames{i}, 100*gK(years == 1990), 100*gK(end), mean(dimp));
+    fprintf('  %-3s  VA at constant shares vs panel GDP: max gap %.1f%%\n', ...
+            cnames{i}, 100*max(abs(VAm(i,:) ./ GDP(i,:) - 1)));
+end
+
+% trade accounting checks
+NX = squeeze(sum(GO,2)) - squeeze(sum(EXPD,2));
 NX_panel  = squeeze(sum(NXS,2));
 GO_tot    = squeeze(sum(GO,2));
+
 gap_cons  = max(abs(NX(:) - NX_panel(:))) / max(abs(NX(:)));
 gap_world = max(abs(sum(NX,1))) / max(sum(GO_tot,1));
+
 if gap_cons > 1e-6
     error(['recover_parameters: the panel''s nx column disagrees with gross ' ...
            'output minus total expenditure by %.2e (relative). The trade ' ...
@@ -286,29 +378,18 @@ end
 fprintf(['Trade accounting: nx vs GO-E %.1e, world sum %.1e of gross output ' ...
          '(both must be ~0).\n'], gap_cons, gap_world);
 
-% Total consumption expenditure from the budget constraint (math appendix,
-% 53), as in the paper's eq (8), rather than from separate measurement. Since
-% w and r are imputed from the capital share, w L + r K = GDP identically, so
-% this is the national accounts identity E^C = GDP - investment - net exports.
-% The WIOT consumption column is kept only as a cross-check: the two agree
-% within a release and diverge only through the 2000 splice.
-EC      = w .* L + r .* K - PXX - NX;
+% consumption expenditure residual
+EC      = w .* L + r .* Klom - PXX - NX;   % = GDP - E^X - NX
 EC_wiot = squeeze(sum(CE,2));
 
-%% Recover the demand shifters mu
-% Invert the sectoral demand system for mu, sector by sector. See
-% eq:mu-tradables in the math appendix for the expression.
-%
-% NOTE: the exponent is (1-psi)*eps^j, not the paper's eps^j - psi.
-% NOTE: intermediate demand uses observed flows, not the beta/nu reconstruction.
-% NOTE: C is identified by sum_j mu^j = kappa, so P^C is an output, not an input.
+% anchor CES aggregator constant (kappa) to PWT
+mu       = zeros(2,J,Ty);
+s_share  = zeros(2,J,Ty);
+Cbar     = zeros(2,Ty);
+PC_model = zeros(2,Ty);
+addup    = zeros(2,Ty);
 
-% Anchor the level of kappa to the PWT consumption price level, while still
-% imposing that sum_j mu^j be constant over time.
-%
-% NOTE: kappa's level is free; its constancy over time is what binds.
-kappa_source = 'pwt_anchor';        %'pwt_anchor' or a 2x1 vector of values
-
+kappa_source = 'pwt_anchor';
 if isnumeric(kappa_source)
     kappa = kappa_source(:);
 else
@@ -320,7 +401,7 @@ else
             Nv = zeros(1,J);
             for j = 1:J
                 Nv(j) = EXPD(i,j,t) - sum(IOF(i,:,j,t)) ...
-                        - ups(i,j) * (Pv(j)/PX(i,t))^(1-zeta) * PXX(i,t);
+                        - mux(i,j,t) * (Pv(j)/PX(i,t))^(1-zeta) * PXX(i,t);
             end
             cb = (EC(i,t)/PC(i,t)) / L(i,t);
             ktmp(t) = sum( Nv ./ (L(i,t) * Pv.^(1-psi) * (EC(i,t)/L(i,t))^psi) ...
@@ -332,50 +413,52 @@ else
     end
 end
 
-mu       = zeros(2,J,Ty);
-s_share  = zeros(2,J,Ty);    %consumption expenditure shares s^j, eq:cons-shares
-Cbar     = zeros(2,Ty);      %C_{i,t}/L_{i,t}, recovered from eq:kappa
-PC_model = zeros(2,Ty);      %model-implied ideal consumption price index
-addup    = zeros(2,Ty);      %sum_j N^j / E^C - 1, the adding-up check
-
 for i = 1:2
     for t = 1:Ty
         Pv = reshape(P(i,:,t), 1, J);
-
-        % numerators N^j of eq:mu-tradables
+        
+        % compute sectoral demand numerators (Y - NX - intermediate - investment).
+        % The investment term uses the recovered mu^x, so it equals observed
+        % sectoral investment expenditure and no longer leaves a gap for mu to
+        % absorb. Agriculture bore that gap before, its consumption share being
+        % under one percent.
         N = zeros(1,J);
         for j = 1:J
-            Dj   = sum(IOF(i,:,j,t));                                  %actual flows
-            Xj   = ups(i,j) * (Pv(j)/PX(i,t))^(1-zeta) * PXX(i,t);     %eq:invshares
-            N(j) = EXPD(i,j,t) - Dj - Xj;      %= Y^j - NX^j - D - X
+            Dj   = sum(IOF(i,:,j,t));
+            Xj   = mux(i,j,t) * (Pv(j)/PX(i,t))^(1-zeta) * PXX(i,t);
+            N(j) = EXPD(i,j,t) - Dj - Xj;
         end
+        
         assert(all(N > 0), 'numerator of eq:mu-tradables is not positive for %s %d', ...
                cnames{i}, years(t))
-
         addup(i,t) = sum(N) / EC(i,t) - 1;
-
-        % solve eq:kappa for C/L. g is strictly decreasing in x = ln(C/L), so
-        % bracket by expanding outward until the sign changes.
+        
+        % root-finding for real per-capita consumption (C/L) from implicit CES aggregator
         A = N ./ (L(i,t) * Pv.^(1-psi) * (EC(i,t)/L(i,t))^psi);
         g = @(x) log(sum(A .* exp(-(1-psi)*eps*x))) - log(kappa(i));
+        
         xlo = -20; xhi = 20;
         while g(xlo) < 0 && xlo > -700, xlo = xlo - 20; end
         while g(xhi) > 0 && xhi <  700, xhi = xhi + 20; end
+        
         assert(g(xlo) > 0 && g(xhi) < 0, ...
                ['eq:kappa has no solution in a sensible range for %s %d: ' ...
                 'kappa_%s = %.4f is outside what the data can deliver'], ...
                cnames{i}, years(t), cnames{i}, kappa(i))
+               
         Cbar(i,t) = exp(fzero(g, [xlo xhi]));
-
+        
+        % recover demand shifters (mu) matching eq:mu-tradables
         mu(i,:,t)      = A .* Cbar(i,t).^(-(1-psi)*eps);
+        
+        % compute implied consumption expenditure shares (s^j)
         s_share(i,:,t) = N / EC(i,t);
         PC_model(i,t)  = (EC(i,t)/L(i,t)) / Cbar(i,t);
     end
 end
 
-% mu must be strictly positive: mu^(1/psi) enters the CES aggregator.
+% validate mu positivity and normalization
 assert(all(mu(:) > 0), 'recovered mu is not strictly positive')
-% and must satisfy the normalization by construction
 assert(max(abs(squeeze(sum(mu,2))./kappa - 1), [], 'all') < 1e-8, ...
        'normalization sum_j mu = kappa failed')
 
@@ -386,14 +469,14 @@ for i = 1:2
     fprintf('    %-3s  pre-2000 max %.2e   post-2000 max %.2e\n', ...
             cnames{i}, max(abs(a(1:t00))), max(abs(a(t00+1:end))));
 end
+
 fprintf('  budget-constraint E^C vs WIOT consumption column:\n');
 for i = 1:2
-    % gap, not d: d is the depreciation rate and this assignment turned it
-    % into a 1 x Ty row vector for every block downstream.
     gap = EC(i,:) ./ EC_wiot(i,:) - 1;
     fprintf('    %-3s  pre-2000 max %.2e   post-2000 max %.2e\n', ...
             cnames{i}, max(abs(gap(1:t00))), max(abs(gap(t00+1:end))));
 end
+
 fprintf('  model-implied P^C vs PWT consumption price level (validation):\n');
 for i = 1:2
     ratio = PC_model(i,:) ./ PC(i,:);
@@ -402,15 +485,7 @@ for i = 1:2
             min(ratio)/mean(ratio), max(ratio)/mean(ratio));
 end
 
-%% unit cost constants varkappa (math appendix, eq:unitcost)
-% Named varkappa, not kappa, because kappa above is the CES aggregator's
-% normalization sum_j mu^j = kappa_i. The appendix uses varkappa for this one
-% precisely to keep them apart; reusing one name here previously overwrote the
-% aggregator constant so it never reached disk.
-%
-% varkappa = (beta phi^phi (1-phi)^(1-phi))^(-beta)
-%            * ((1-beta) prod_m nu_m^nu_m)^(-(1-beta))
-% which is the appendix's expression regrouped; verified identical to 4e-16.
+% compute unit cost constants (varkappa)
 varkappa = zeros(2,J);
 for i = 1:2
     for j = 1:J
@@ -422,7 +497,7 @@ for i = 1:2
     end
 end
 
-%% unit costs c (math appendix, eq:unitcost)
+% compute unit costs (c) wrapping factor prices and intermediate prices
 c = zeros(2,J,Ty);
 for i = 1:2
     for j = 1:J
@@ -434,9 +509,7 @@ for i = 1:2
     end
 end
 
-%% trade costs tau and productivities T (math appendix, eq:gravity-ratio and eq:homeshare)
-%tau(im,ex) is the cost of importer im buying from exporter ex. Loop counters
-%are im/ex rather than d/o for the reason given at the import share block.
+% recover bilateral trade costs (tau) and home productivities (T)
 tau   = ones(2,2,J,Ty);
 Tprod = zeros(2,J,Ty);
 for j = 1:J
@@ -444,31 +517,30 @@ for j = 1:J
         for im = 1:2
             for ex = 1:2
                 if im ~= ex
+                    % tau from gravity ratio (relative prices and trade shares)
                     tau(im,ex,j,t) = (P(im,j,t)/P(ex,j,t)) * ...
                                      (pi_mat(ex,ex,j,t)/pi_mat(im,ex,j,t))^(1/theta);
                 end
             end
         end
         for i = 1:2
+            % T from inverting home trade share equation
             Tprod(i,j,t) = pi_mat(i,i,j,t) * (Gam * c(i,j,t) / P(i,j,t))^theta;
         end
     end
 end
 
-%% Recover the financial friction and the world interest rate
-% Two equations, three unknowns, so ROW's friction is normalized to zero. The
-% ROW Euler equation then gives the world interest rate, and the US Euler
-% equation gives the US friction. See eq:euler in the math appendix.
+% compute Head-Ries symmetric trade friction (htau)
+htau = zeros(J,Ty);
+for j = 1:J
+    for t = 1:Ty
+        htau(j,t) = (pi_mat(1,1,j,t) * pi_mat(2,2,j,t) / ...
+                     (pi_mat(1,2,j,t) * pi_mat(2,1,j,t)))^(1/(2*theta));
+    end
+end
 
-% Consumption expenditure shares, eq:cons-shares in the appendix. The recovery
-% already delivers them as N^j/E^C. They sum to one only up to the
-% over-identifying residual reported above (well under 1% before 2000), not by
-% construction -- that residual IS the appendix's adding-up check.
+% compute structural wedge (phitilde) from consumption shares
 varpi = s_share;
-
-% Structural wedge under aggregator (1): phitilde(i,t) = (sum_j eps_j s^j)^{-1}.
-% The paper's counterpart is (1-psi)*(sum_j eps_j s^j - psi)^{-1}; the (1-psi)
-% factors cancel at the differentiation step under eq:aggregator. See eq:euler.
 phitilde = zeros(2,Ty);
 for i = 1:2
     for t = 1:Ty
@@ -476,80 +548,100 @@ for i = 1:2
     end
 end
 
-% World interest rate R_{t+1} from the ROW Euler equation alone, since the
-% normalization phi_ROW = 0 leaves R as its only unknown. Appendix eq:worldR:
-%   R_{t+1} = (1/delta) * (E^C_ROW,t+1/E^C_ROW,t) * (L_ROW,t/L_ROW,t+1)
-%                       * (phitilde_ROW,t/phitilde_ROW,t+1)
-% Written below with per-worker expenditure, which folds the two ratios into one.
-R_w = zeros(1,Ty-1);
+% roll the bond position forward from the balance of payments (eq:bop). The
+% stock carried into t earns R_t, not R_{t+1}, since the bond FOC prices bonds
+% bought at t. Zero net supply makes ROW the mirror image (eq:bmirror), which
+% holds here because world net exports are zero to machine precision.
+B      = zeros(2,Ty);
+B(:,1) = [B1965_USA; -B1965_USA];
+Bbar   = [Bbar_USA; -Bbar_USA];
+
 for t = 1:Ty-1
-    ecpc_next = EC(2,t+1) / L(2,t+1);
-    ecpc_now  = EC(2,t)   / L(2,t);
-    R_w(t) = (ecpc_next / ecpc_now) / delta * ...
-             phitilde(2,t) / phitilde(2,t+1);
+    B(:,t+1) = R_obs(t) * B(:,t) + NX(:,t);
 end
+assert(max(abs(B(1,:) + B(2,:))) / max(abs(B(1,:))) < 1e-9, ...
+       'the two bond positions are not mirror images, so bonds are not in zero net supply')
 
-% Accumulate bonds from net exports, then back out the US friction.
+% recover the friction for each country separately (eq:phi-recover). With
+% R_{t+1} observed both Euler equations are free, so nothing is normalized:
+% the US friction is now recovered rather than set to zero.
 %
-% NOTE: bonds earn R_t, i.e. R_w(t-1), not R_w(t).
-% NOTE: report the wedge, not phi, which blows up where bonds cross zero.
-B     = zeros(2,Ty);
-phi_f = nan(2,Ty-1);    % friction, undefined at T (needs t+1)
-wedge = nan(2,Ty-1);    % effective return wedge, 1 + phi (B - Bbar)
-Bbar  = [0; 0];         % baseline foreign asset positions [US; ROW]
+% NOTE: phi is undefined where B_{t+1} = Bbar, so do not set Bbar to a value
+% the series attains.
+phi_f = nan(2,Ty-1);
+wedge = nan(2,Ty-1);
 
 for t = 1:Ty-1
-    % Bonds at t+1, at the return earned into t
-    if t == 1
-        B(:,t+1) = NX(:,t);                          % B(:,1) = 0
-    else
-        B(:,t+1) = R_w(t-1) * B(:,t) + NX(:,t);
-    end
-
-    % US friction (ROW friction is zero by normalization)
-    phi_f(1,t) = (1 / (B(1,t+1) - Bbar(1))) * ...
-        (EC(1,t)/L(1,t) / (EC(1,t+1)/L(1,t+1)) * ...
-         phitilde(1,t+1)/phitilde(1,t) * delta * R_w(t) - 1);
-    phi_f(2,t) = 0;
-
     for i = 1:2
-        wedge(i,t) = 1 + phi_f(i,t) * (B(i,t+1) - Bbar(i));
+        % the Euler residual: what the wedge has to be to close the equation
+        resid = (EC(i,t)/L(i,t)) / (EC(i,t+1)/L(i,t+1)) * ...
+                phitilde(i,t+1)/phitilde(i,t) * delta * R_obs(t+1);
+        gap   = B(i,t+1) - Bbar(i);
+
+        phi_f(i,t) = (resid - 1) / gap;
+        wedge(i,t) = 1 + phi_f(i,t) * gap;
     end
 end
 
-%% Recover the investment efficiency shifter chi
-% Invert the capital accumulation equation directly, using the observed PWT
-% capital stock. Undefined in the terminal year, which needs next year's capital.
-%
-% NOTE: no recursion needed. K is observed, so the law of motion suffices.
+bscale = max(abs(B - Bbar), [], 'all');
+if min(abs(B(:,2:Ty) - Bbar), [], 'all') < 1e-6 * bscale
+    warning(['recover_parameters: the bond position comes within 1e-6 of Bbar, ' ...
+             'so phi is near-singular there. The wedge is still well behaved.'])
+end
 
-X = PXX ./ PX;                  % real aggregate investment
-
-chi = nan(2,Ty);
+% the rate the US Euler equation would need at zero friction, which is how R
+% used to be identified. Now an over-identifying check against the Treasury yield.
+R_euler = nan(2,Ty-1);
 for i = 1:2
     for t = 1:Ty-1
-        net      = K(i,t+1) - (1-d) * K(i,t);
-        chi(i,t) = net / (X(i,t)^sigma * K(i,t)^(1-sigma));
+        R_euler(i,t) = ((EC(i,t+1)/L(i,t+1)) / (EC(i,t)/L(i,t))) / delta * ...
+                       phitilde(i,t)/phitilde(i,t+1);
     end
 end
 
-fprintf('\nInvestment block:\n');
+fprintf('\nFinancial friction:\n');
+fprintf('  observed R (10-year Treasury): mean %.4f, range [%.4f %.4f]\n', ...
+        mean(R_obs), min(R_obs), max(R_obs));
 for i = 1:2
-    fprintf('  %-3s  chi (sigma=%.2f) mean %.4f range [%.4f %.4f]\n', ...
-        cnames{i}, sigma, mean(chi(i,1:Ty-1)), min(chi(i,1:Ty-1)), max(chi(i,1:Ty-1)));
+    fprintf(['  %-3s  wedge range [%.4f %.4f]   frictionless Euler R mean %.4f ' ...
+             '(observed %.4f)\n'], cnames{i}, min(wedge(i,:)), max(wedge(i,:)), ...
+            mean(R_euler(i,:)), mean(R_obs(2:Ty)));
 end
-fprintf('  Euler return wedge 1+phi(B-Bbar), USA: range [%.4f %.4f]\n', ...
-    min(wedge(1,1:Ty-1)), max(wedge(1,1:Ty-1)));
 
-%% sectoral investment shares: observed vs the model's constant upsilon
-% ups is a time average of XE./sum(XE,2). The model imposes zeta = 1, so
-% eq:invshares makes the share of investment spending on sector j equal to
-% upsilon^j in every year. x_obs is the actual year by year share. The gap is
-% what the mu inversion has to absorb, and agriculture bears it because its
-% consumption share is under one percent.
-x_obs = XE ./ sum(XE,2);        % (2 x J x Ty) observed investment shares
+% recover the investment tax from the capital Euler equation (eq:xi-recover).
+% Only the growth of chi is identified, so chi is one in the first year and
+% chained forward.
+%
+% NOTE: R cancels here. The wedge already contains delta*R_{t+1}, so chi is
+% invariant to the interest rate series and only the expenditure growth,
+% rental rate and investment price move it.
+chi_ratio = nan(2,Ty-1);
+for i = 1:2
+    for t = 1:Ty-1
+        chi_ratio(i,t) = (R_obs(t+1) / wedge(i,t)) * PX(i,t) / ...
+                         ( r(i,t+1) + (1-d) * PX(i,t+1) );
+    end
+end
 
-%% save time varying parameters
+chi = ones(2,Ty);
+for t = 1:Ty-1
+    chi(:,t+1) = chi(:,t) .* chi_ratio(:,t);
+end
+
+% steady state: the ratio at one gives the required rent, hence the terminal
+% capital stock the forward solve needs (eq:kss)
+r_ss = PX(:,Ty) * (1/delta - (1-d));
+K_ss = phi .* GDP(:,Ty) ./ r_ss;
+
+fprintf('\nInvestment tax:\n');
+for i = 1:2
+    fprintf('  %-3s  chi_t+1/chi_t mean %.4f range [%.4f %.4f], level %d %.3f\n', ...
+            cnames{i}, mean(chi_ratio(i,:)), min(chi_ratio(i,:)), max(chi_ratio(i,:)), ...
+            years(Ty), chi(i,Ty));
+    fprintf('  %-3s  K_ss / K_%d %.3f\n', cnames{i}, years(Ty), K_ss(i) / Klom(i,Ty));
+end
+
+% export time-varying parameters
 n = 2*J*Ty;
 country = cell(n,1);
 yr      = zeros(n,1);
@@ -558,8 +650,8 @@ mu_v    = zeros(n,1);
 c_v     = zeros(n,1);
 T_v     = zeros(n,1);
 tau_v   = zeros(n,1);
-
 dex = 0;
+
 for i = 1:2
     for j = 1:J
         for t = 1:Ty
@@ -570,30 +662,31 @@ for i = 1:2
             mu_v(dex)    = mu(i,j,t);
             c_v(dex)     = c(i,j,t);
             T_v(dex)     = Tprod(i,j,t);
-            tau_v(dex)   = tau(i,3-i,j,t);   %import trade cost
+            tau_v(dex)   = tau(i,3-i,j,t);
         end
     end
 end
 
-% s_share is exported because the counterfactual needs baseline consumption
-% expenditure shares as weights: written in changes, the demand block uses
-% observed shares and the mu levels drop out entirely.
 s_v = zeros(n,1);
+htau_v = zeros(n,1);
 dex = 0;
+
 for i = 1:2
     for j = 1:J
         for t = 1:Ty
             dex = dex + 1;
-            s_v(dex) = s_share(i,j,t);
+            s_v(dex)   = s_share(i,j,t);
+            htau_v(dex) = htau(j,t);
         end
     end
 end
 
-out = table(country, yr, sec, mu_v, c_v, T_v, tau_v, s_v, ...
-    'VariableNames', {'country','year','sector','mu','unit_cost','T','tau','cons_share'});
+out = table(country, yr, sec, mu_v, c_v, T_v, tau_v, htau_v, s_v, ...
+    'VariableNames', {'country','year','sector','mu','unit_cost','T', ...
+                      'tau','htau','cons_share'});
 writetable(out, strcat(datapath, 'recovered_parameters.csv'))
 
-%% save constant parameters
+% export constant parameters
 n2 = 2*J;
 country2 = cell(n2,1);
 sec2     = cell(n2,1);
@@ -602,8 +695,8 @@ ups_v    = zeros(n2,1);
 kappa_v  = zeros(n2,1);
 kagg_v   = zeros(n2,1);
 phi_v    = zeros(n2,1);
-
 dex = 0;
+
 for i = 1:2
     for j = 1:J
         dex = dex + 1;
@@ -611,8 +704,8 @@ for i = 1:2
         sec2{dex}     = secs{j};
         beta_v(dex)   = beta(i,j);
         ups_v(dex)    = ups(i,j);
-        kappa_v(dex)  = varkappa(i,j);   %unit cost constant, eq:unitcost
-        kagg_v(dex)   = kappa(i);        %CES aggregator constant, eq:kappa
+        kappa_v(dex)  = varkappa(i,j);
+        kagg_v(dex)   = kappa(i);
         phi_v(dex)    = phi(i);
     end
 end
@@ -621,14 +714,14 @@ out2 = table(country2, sec2, beta_v, ups_v, kappa_v, kagg_v, phi_v, ...
     'VariableNames', {'country','sector','beta','upsilon','varkappa','kappa_agg','phi'});
 writetable(out2, strcat(datapath, 'recovered_constants.csv'))
 
-%% save IO coefficients nu
+% export IO coefficients (nu)
 n3 = 2*J*J;
 country3 = cell(n3,1);
 use_sec  = cell(n3,1);
 src_sec  = cell(n3,1);
 nu_v     = zeros(n3,1);
-
 dex = 0;
+
 for i = 1:2
     for j = 1:J
         for m = 1:J
@@ -645,22 +738,19 @@ out3 = table(country3, use_sec, src_sec, nu_v, ...
     'VariableNames', {'country','using_sector','source_sector','nu'});
 writetable(out3, strcat(datapath, 'recovered_nu.csv'))
 
-%% save country-year level parameters (friction, efficiency shifter, world interest rate)
-% phi_f(i,t)      financial friction coefficient, undefined at T. Units depend
-%                 on the units of B; use wedge for anything interpretable.
-% wedge(i,t)      1 + phi_f (B - Bbar), the effective return wedge.
-% bonds(i,t)      net foreign asset position B_{i,t+1}, millions USD.
-% chi(i,t)        investment-specific efficiency shifter at sigma.
-% R_w(t)          world interest rate for period t+1.
+% export friction, wedge, bonds and the investment tax. Row t holds the
+% quantities dated t: the wedge and chi_ratio span t to t+1, chi is the level
+% at t, and bonds is the position B_{t+1} the friction is charged on.
 n4 = 2*(Ty-1);
 country4 = cell(n4,1);
 yr4      = zeros(n4,1);
 phi_fv   = zeros(n4,1);
 wedge_v  = zeros(n4,1);
 bonds_v  = zeros(n4,1);
-chi_v    = zeros(n4,1);
-
+chirat_v = zeros(n4,1);
+chilvl_v = zeros(n4,1);
 dex = 0;
+
 for i = 1:2
     for t = 1:Ty-1
         dex = dex + 1;
@@ -669,24 +759,26 @@ for i = 1:2
         phi_fv(dex)   = phi_f(i,t);
         wedge_v(dex)  = wedge(i,t);
         bonds_v(dex)  = B(i,t+1);
-        chi_v(dex)    = chi(i,t);
+        chirat_v(dex) = chi_ratio(i,t);
+        chilvl_v(dex) = chi(i,t);
     end
 end
 
-out4 = table(country4, yr4, phi_fv, wedge_v, bonds_v, chi_v, ...
-    'VariableNames', {'country','year','friction','wedge','bonds','chi'});
+out4 = table(country4, yr4, phi_fv, wedge_v, bonds_v, chirat_v, chilvl_v, ...
+    'VariableNames', {'country','year','friction','wedge','bonds', ...
+                      'chi_ratio','chi'});
 writetable(out4, strcat(datapath, 'recovered_friction.csv'))
 
-% Sectoral investment shares: the model's constant upsilon against the
-% observed year by year shares (see the investment block above).
+% export sectoral investment shares and the recovered investment shifters
 n6 = 2*J*Ty;
 country6 = cell(n6,1);
 yr6      = zeros(n6,1);
 sec6     = cell(n6,1);
 xobs_v   = zeros(n6,1);
 ups6_v   = zeros(n6,1);
-
+mux_v    = zeros(n6,1);
 dex = 0;
+
 for i = 1:2
     for j = 1:J
         for t = 1:Ty
@@ -696,39 +788,37 @@ for i = 1:2
             sec6{dex}     = secs{j};
             xobs_v(dex)   = x_obs(i,j,t);
             ups6_v(dex)   = ups(i,j);
+            mux_v(dex)    = mux(i,j,t);
         end
     end
 end
 
-out6 = table(country6, yr6, sec6, xobs_v, ups6_v, ...
-    'VariableNames', {'country','year','sector','x_share_obs','upsilon'});
+out6 = table(country6, yr6, sec6, xobs_v, ups6_v, mux_v, ...
+    'VariableNames', {'country','year','sector','x_share_obs','upsilon','mu_x'});
 writetable(out6, strcat(datapath, 'recovered_invshares.csv'))
 
-% World interest rate (country-invariant, one value per year transition)
+% export the world interest rate. Row t holds R_{t+1}, the rate that prices a
+% bond bought at t, so it lines up with the friction file.
 n5 = Ty-1;
 yr5     = (years(1:Ty-1))';
-Rw_v    = R_w';
-
+Rw_v    = R_obs(2:Ty)';
 out5 = table(yr5, Rw_v, ...
     'VariableNames', {'year','R_world'});
 writetable(out5, strcat(datapath, 'recovered_world_rate.csv'))
 
-%% save the country-year consumption block, all Ty years
-% cbar     C_{i,t}/L_{i,t}, real consumption per worker, the root of eq:kappa.
-% pc_model the model's own ideal price index, E^C/(L cbar). An OUTPUT of the
-%          recovery, not an input -- the counterfactual needs it to replace the
-%          PWT stand-in, and it is the object eq:priceindex defines.
-% ec       total consumption expenditure from the budget constraint.
-% These are separate from recovered_friction.csv because they are defined in
-% every year, while the friction and chi are not defined at T.
+% export country-year consumption block
 n7 = 2*Ty;
 country7 = cell(n7,1);
 yr7      = zeros(n7,1);
 cbar_v   = zeros(n7,1);
 pcm_v    = zeros(n7,1);
+pxm_v    = zeros(n7,1);
 ec_v     = zeros(n7,1);
-
+k_v      = zeros(n7,1);
+r_v      = zeros(n7,1);
+vam_v    = zeros(n7,1);
 dex = 0;
+
 for i = 1:2
     for t = 1:Ty
         dex = dex + 1;
@@ -736,12 +826,15 @@ for i = 1:2
         yr7(dex)      = years(t);
         cbar_v(dex)   = Cbar(i,t);
         pcm_v(dex)    = PC_model(i,t);
+        pxm_v(dex)    = PX(i,t);
         ec_v(dex)     = EC(i,t);
+        k_v(dex)      = Klom(i,t);
+        r_v(dex)      = r(i,t);
+        vam_v(dex)    = VAm(i,t);
     end
 end
 
-out7 = table(country7, yr7, cbar_v, pcm_v, ec_v, ...
-    'VariableNames', {'country','year','cbar','pc_model','ec'});
+out7 = table(country7, yr7, cbar_v, pcm_v, pxm_v, ec_v, k_v, r_v, vam_v, ...
+    'VariableNames', {'country','year','cbar','pc_model','px_model','ec','k','r','va_model'});
 writetable(out7, strcat(datapath, 'recovered_consumption.csv'))
-
 fprintf('Done. Parameters written to %s\n', datapath)

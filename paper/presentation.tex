@@ -1,240 +1,357 @@
 \documentclass[10pt]{beamer}
-
+\usepackage[T1]{fontenc}   % \k{e} in Swiecki needs this
 \usepackage{amsmath}
 \usepackage{amssymb}
 \usepackage{booktabs}
+\usepackage{array}
 \usepackage{graphicx}
-
+\usepackage{xcolor}
+\newcolumntype{L}[1]{>{\raggedright\arraybackslash}p{#1}}
+%-------------------------------------------------------
+%   Look
+%-------------------------------------------------------
 \usetheme{default}
+\definecolor{accent}{RGB}{31,71,136}
+\definecolor{dev}{RGB}{214,40,40}   % where we depart from the paper
+\newcommand{\dev}[1]{\textcolor{dev}{#1}}
+\setbeamercolor{structure}{fg=accent}
+\setbeamercolor{frametitle}{fg=accent}
+\setbeamerfont{frametitle}{series=\bfseries}
+\setbeamerfont{framesubtitle}{size=\normalsize}
 \setbeamertemplate{navigation symbols}{}
 \setbeamertemplate{itemize items}[circle]
+\setbeamertemplate{enumerate items}[default]
 \setlength{\abovedisplayskip}{4pt}
 \setlength{\belowdisplayskip}{4pt}
-
-% Placeholder frame: heading only, content to be added later
-\newcommand{\todoframe}[3]{%
+% Frame number, bottom right.
+\setbeamertemplate{footline}{%
+  \hfill{\usebeamercolor[fg]{structure}\scriptsize\insertframenumber}%
+  \hspace{1.2em}\vspace{4pt}}
+% One list spacing everywhere. Every itemize and enumerate opens with \itms.
+\newcommand{\itms}{\itemsep5pt}
+%-------------------------------------------------------
+%   Frame helpers
+%-------------------------------------------------------
+% Where figures live. Each \figframe passes a bare file name and LaTeX searches
+% these in order, so the same file builds on Overleaf (figures/ in the project)
+% and in the repo (../analysis/results/figures/).
+\graphicspath{{./}{figures/}{../analysis/results/figures/}}
+% One figure per frame, identical sizing throughout.
+\newcommand{\figframe}[3]{%
   \begin{frame}{#1}{#2}
+    \vspace{6pt}
+    \centering
+    \includegraphics[width=\textwidth,height=0.76\textheight,keepaspectratio]{#3}
+  \end{frame}}
+% Appendix links. \ap{label} marks a word with a faint superscript that jumps to
+% the appendix frame; \apback{label} is the small return arrow that goes back.
+\newcommand{\ap}[1]{%
+  \hyperlink{#1}{\structure{\textsuperscript{\tiny$\blacktriangleright$}}}}
+\newcommand{\apback}[1]{%
+  \vfill\raggedleft\hyperlink{#1}{\structure{\tiny$\blacktriangleleft$\,back}}}
+% Placeholder frame: heading only, content to be added later
+\newcommand{\todoframe}[3][TO ADD.]{%
+  \begin{frame}{#2}{#3}
     \vfill
-    \centering \textit{#3}
+    \centering \textit{#1}
     \vfill
   \end{frame}}
-
+% Divider frame at each section.
+\AtBeginSection[]{%
+  \begin{frame}[plain]
+    \vfill
+    \centering{\usebeamercolor[fg]{structure}\Large\insertsectionhead}
+    \vfill
+  \end{frame}}
 \title{Title}
 \author{Mitchell Ballif}
 \date{\today}
-
 \begin{document}
-
-\begin{frame}
+\begin{frame}[plain]
   \titlepage
 \end{frame}
-
 %=======================================================
 \section{Introduction}
 %=======================================================
-
-\begin{frame}{Introduction}{The question}
+\figframe{Introduction}{Motivation}{us_trade_motivation.pdf}
+\begin{frame}{Introduction}{Literature}
+  \structure{\textbf{Closed  economy}}
+  \begin{itemize}\itms
+    \item Technology story --- Baumol (1967); Ngai \& Pissarides (2007)
+    \item Non-homothetic preferences --- Kongsamut, Rebelo \& Xie (2001);
+          Boppart (2014); Comin, Lashkari \& Mestieri (2021)
+  \end{itemize}
+  \vspace{8pt}
+  \structure{\textbf{Open economy}}
+  \begin{itemize}\itms
+    \item Comparative advantage --- Matsuyama (1992, 2009)
+    \item Quantitative decompositions --- Uy, Yi \& Zhang (2013);
+          \'Swi\k{e}cki (2017); Sposi (2019); Cravino \& Sotelo (2019);
+          Sposi, Yi \& Zhang (2024)
+  \end{itemize}
+  \vspace{8pt}
+  \structure{\textbf{Trade imbalances}}
+  \begin{itemize}\itms
+    \item Imbalances $\to$ sectoral composition --- Kehoe, Ruhl \& Steinberg (2018)
+  \end{itemize}
+\end{frame}
+\begin{frame}{Introduction}{Research question}
   \vfill
   \begin{center}
   \large
-  How much have financial frictions, working through changes in the trade
-  deficit, affected the process of structural transformation in the United
-  States?
+  U.S.\ manufacturing's share of value added fell 13 percentage points
+  between 1965 and 2014.\\[10pt]
+  \structure{\textbf{How much of that decline was caused by falling trade costs?}}
   \end{center}
   \vfill
-  \centering \normalsize (sectoral value-added shares)
+  \begin{center}
+  \normalsize
+  And how much of the answer depends on letting the trade deficit adjust?
+  \end{center}
   \vfill
 \end{frame}
-
-\todoframe{Introduction}{Motivation}{[TO ADD. Figure: U.S. manufacturing
-value-added share and the trade deficit, 1965--2014.]}
-
-\todoframe{Introduction}{What I do}{[TO ADD.]}
-
-\todoframe{Introduction}{Literature}{[TO ADD.]}
-
-%=======================================================
-\section{Results}
-%=======================================================
-
-\todoframe{Results}{Main result}{[TO ADD. Figure: manufacturing value-added share,
-baseline against counterfactual.]}
-
-
-
-
+\begin{frame}{Introduction}{Contribution}
+  \vfill
+  \begin{enumerate}\itms
+    \item Extended baseline SC model (trade imbalance + financial frictions)
+    \item Wrote math appendix (solving and inverting equilibrium conditions)
+    \item Built long-run panel using World IO data
+    \item Took the model to data (recovered shocks)
+  \end{enumerate}
+  \vfill
+\end{frame}
 %=======================================================
 \section{Model}
 %=======================================================
-
 \begin{frame}{Model}{Environment}
-  \begin{itemize}\itemsep8pt
-    \item Two countries $i\in\{US,ROW\}$, three sectors
-          $j\in\mathcal{J}=\{a,m,s\}$, years $t=1,\dots,T$.
-    \item All sectors tradable
-    \item Each country: a representative household that consumes, invests, and
-          trades one risk-free bond.
-    \item Disturbances: $\mu^j_{i,t}$ (tastes), $T^j_{i,t}$ (productivity),
-          $\tau^j_{ih,t}$ (trade costs), $\chi_{i,t}$ (investment efficiency),
-          $\phi_{i,t}$ (financial friction).
+  \begin{itemize}\itms
+    \item Time is discrete, $t=1965,\dots,2014$.
+    \item Two countries: US and the rest of the world,
+          $i\in\mathcal{I}\equiv\{US,\,ROW\}$.
+    \item Three sectors in each country, all tradable,
+          $j\in\mathcal{J}\equiv\{a,m,s\}$.
+    \item Representative household in each country:
+      \begin{itemize}\itms
+        \item Country $i$ endowed with $L_{i,t}$ units of homogeneous labor in
+              every $t$ and $K_{i,0}$ units of homogeneous physical capital.
+        \item Access to international financial markets by means of buying and
+              selling one-period bonds with portfolio adjustment costs.
+        \item Born with zero NFA, $B_{i,0}=0$.
+      \end{itemize}
   \end{itemize}
 \end{frame}
+\begin{frame}{Model}{The Household's Dynamic Problem}\label{fr:hh}
+  \small
+  The representative household in country $i$ chooses consumption, investment,
+  capital, and bonds to maximize:
+  \begin{equation*}
+    \max \sum_{t=0}^{\infty} \delta^t L_{i,t} \ln \left(\bar{C}_{i,t}\right)
+  \end{equation*}
 
-\begin{frame}{Model}{Preferences}
-  Real consumption $C_{i,t}$ is defined implicitly by
+  \vspace{4pt}
+  subject to
   \begin{align*}
-    \sum_{j \in \mathcal{J}}
-    \left(\mu^{j}_{i,t}\right)^{\frac{1}{\psi}}
-    \left(\frac{C_{i,t}}{L_{i,t}}\right)^{\frac{1-\psi}{\psi}\varepsilon^j}
-    \left(\frac{C^j_{i,t}}{L_{i,t}}\right)^{\frac{\psi-1}{\psi}} = 1,
-    \qquad \textstyle\sum_j \varepsilon^j = 1 .
+    E^C_{i,t} + \frac{E^X_{i,t}}{\dev{\xi_{i,t}}} + B_{i,t+1}
+      + \dev{\frac{\phi_{i,t}}{2}\left(B_{i,t+1}-\bar{B}_i\right)^2}
+      &= w_{i,t} L_{i,t} + \frac{r_{i,t} K_{i,t}}{\dev{\xi_{i,t}}} + R_t B_{i,t} + T_{i,t} \\
+    K_{i,t+1} &= (1-d) K_{i,t} + \left(X_{i,t}\right)^\sigma \left(K_{i,t}\right)^{1-\sigma}
   \end{align*}
-  \vspace{2pt}
-  Nonhomothetic CES: $\psi$ substitutes across sectors, $\varepsilon^j$ is
-  sector $j$'s income elasticity. Homothetic iff all $\varepsilon^j$ equal.
+
+  \vspace{4pt}
+  where $\bar{C}_{i,t}$ is defined implicitly (CLM, 2017):
+  \begin{equation*}
+    \sum_{j \in \mathcal{J}} \left(\mu^j_{i,t}\right)^{\frac{1}{\psi}}
+    \left(\frac{C_{i,t}}{L_{i,t}}\right)^{\dev{\frac{1-\psi}{\psi}\varepsilon^j}}
+    \left(\frac{C^j_{i,t}}{L_{i,t}}\right)^{\frac{\psi-1}{\psi}} = 1
+  \end{equation*}
+  and $\psi > 0$, $\mu^j_{i,t} > 0$, and $\sum_j \varepsilon^j = 1$.\ap{ap:cal}
+
+  {\footnotesize \dev{Coloured}: the three departures from Reyes-Heroles (2018) --- a
+  capital wedge, a portfolio adjustment cost in place of a preference shifter, and the CLM
+  parameterization of the aggregator.}
 \end{frame}
-
-\begin{frame}{Model}{Consumption demand}
-  \begin{align*}
-    s^j_{i,t}
-    = \mu^j_{i,t}\left(\frac{P^j_{i,t}}{P^C_{i,t}}\right)^{1-\psi}
-      \left(\frac{C_{i,t}}{L_{i,t}}\right)^{(1-\psi)(\varepsilon^j-1)},
-    \qquad
-    E^C_{i,t} = P^C_{i,t}C_{i,t},
-  \end{align*}
-  \begin{align*}
-    P^C_{i,t} = \left[
-      \sum_{j \in \mathcal{J}} \mu^j_{i,t}
-      \left(\frac{C_{i,t}}{L_{i,t}}\right)^{(1-\psi)(\varepsilon^j-1)}
-      \left(P^j_{i,t}\right)^{1-\psi}\right]^{\frac{1}{1-\psi}} .
-  \end{align*}
-  \vspace{2pt}
-  Real consumption enters the shares: income growth alone reallocates spending.
-\end{frame}
-
-\begin{frame}{Model}{Investment and capital}
-  Homothetic CES with weights $\upsilon^j_i$ and elasticity $\zeta$. At $\zeta=1$,
-  \begin{align*}
-    x^j_{i,t} = \upsilon^j_i,
-    \qquad
-    P^X_{i,t} = \prod_j \left(P^j_{i,t}\right)^{\upsilon^j_i},
-    \qquad
-    E^X_{i,t} = P^X_{i,t}X_{i,t}.
-  \end{align*}
-  \begin{align*}
-    K_{i,t+1} = (1-d)K_{i,t}
-      + \chi_{i,t}\left(X_{i,t}\right)^{\sigma}\left(K_{i,t}\right)^{1-\sigma}.
-  \end{align*}
-  \vspace{2pt}
-  At $\sigma=0$: $K_{i,t+1}=K_{i,t}(1-d+\chi_{i,t})$, and investment is held at its
-  observed share of GDP.
-\end{frame}
-
-\begin{frame}{Model}{The household's dynamic problem}
-  $\max \sum_t \delta^t L_{i,t}\ln \bar{C}_{i,t}$, where
-  $\bar{C}_{i,t}\equiv C_{i,t}/L_{i,t}$, subject to
-  \begin{align*}
-    E^C_{i,t} + E^X_{i,t} + B_{i,t+1}
-    + \tfrac{\phi_{i,t}}{2}\left(B_{i,t+1}-\bar{B}_i\right)^2
-    &= w_{i,t}L_{i,t} + r_{i,t}K_{i,t} + R_{t}B_{i,t} + T_{i,t}.
-  \end{align*}
-  \begin{itemize}\itemsep6pt
-          shifter, replaced.
-    \item Cost rebated lump sum, so
-          $E^C_{i,t}=VA_{i,t}-E^X_{i,t}-NX_{i,t}$.
-    \item Bonds in zero net supply: $\sum_iB_{i,t}=0$,
-          $B_{i,t+1}=R_tB_{i,t}+NX_{i,t}$.
-  \end{itemize}
-\end{frame}
-
-\begin{frame}{Model}{Euler Equation}
-  \begin{align*}
-    \underbrace{\frac{P^C_{i,t+1}\bar{C}_{i,t+1}}{P^C_{i,t}\bar{C}_{i,t}}}_{\text{expenditure growth}}
-    = \underbrace{\frac{\widetilde{\phi}_{i,t+1}}{\widetilde{\phi}_{i,t}}}_{\text{structural wedge}}
-      \cdot \underbrace{\delta}_{\text{discounting}}
-      \cdot \underbrace{\frac{R_{t+1}}{\omega_{i,t}}}_{\text{effective return}},
-  \end{align*}
-  \begin{align*}
-    \omega_{i,t} \equiv 1 + \phi_{i,t}\left(B_{i,t+1}-\bar{B}_i\right),
-    \qquad
-    \widetilde{\phi}_{i,t} \equiv \Big(\sum_j\varepsilon^js^j_{i,t}\Big)^{-1}.
-  \end{align*}
-  \vspace{2pt}
-  $\omega_{i,t}$ is the financial wedge
-\end{frame}
-
-\begin{frame}{Model}{Technology and unit costs}
-  Fr\'echet draws, scale $T^j_{i,t}$ and shape $\theta$:
-  \begin{align*}
-    q^j_{i,t}(\omega^j) = x^j_{i,t}(\omega^j)
-    \left[k^{\varphi_i}l^{1-\varphi_i}\right]^{\beta^j_i}
-    \left[\prod_{m\in\mathcal{J}}\left(D^{j,m}\right)^{\nu^{j,m}_i}\right]^{1-\beta^j_i}.
-  \end{align*}
-  Perfect competition, so the input bundle costs
-  \begin{align*}
-    c^j_{i,t} = \varkappa^j_i
-    \left(r_{i,t}^{\varphi_i}w_{i,t}^{1-\varphi_i}\right)^{\beta^j_i}
-    \left(\prod_{m\in\mathcal{J}}\left(P^m_{i,t}\right)^{\nu^{j,m}_i}\right)^{1-\beta^j_i}.
-  \end{align*}
-  \vspace{2pt}
-  $\beta^j_i$, $\varphi_i$, $\nu^{j,m}_i$ are time-invariant.
-\end{frame}
-
-\begin{frame}{Model}{Trade}
-  Iceberg costs $\tau^j_{ih,t}\geq1$, $\tau^j_{ii,t}=1$. Buyers source each variety
-  from the cheapest supplier:
-  \begin{align*}
-    P^j_{i,t} = \Gamma\left[\Phi^j_{i,t}\right]^{-\frac{1}{\theta}},
-    \qquad
-    \pi^j_{ih,t}
-    = \frac{T^j_{h,t}\left(c^j_{h,t}\tau^j_{ih,t}\right)^{-\theta}}{\Phi^j_{i,t}},
-    \qquad
-    \Phi^j_{i,t} = \sum_h T^j_{h,t}\left(c^j_{h,t}\tau^j_{ih,t}\right)^{-\theta}.
-  \end{align*}
-  \vspace{2pt}
-  $\pi^j_{ih,t}$: buyer first, seller second. Services trade too, at a common
-  $\theta$.
-\end{frame}
-
-\begin{frame}{Model}{Market clearing}
-  \begin{align*}
-    E^j_{i,t} = s^j_{i,t}E^C_{i,t} + \upsilon^j_i E^X_{i,t}
-    + \sum_{m\in\mathcal{J}} \nu^{m,j}_i\left(1-\beta^m_i\right)Y^m_{i,t},
-    \quad
-    Y^j_{i,t} = \sum_h \pi^j_{hi,t}E^j_{h,t}.
-  \end{align*}
-  \begin{align*}
-    VA_{i,t} = \sum_j \beta^j_i Y^j_{i,t},
-    \qquad
-    w_{i,t}L_{i,t} = (1-\varphi_i)VA_{i,t},
-    \qquad
-    r_{i,t}K_{i,t} = \varphi_i VA_{i,t},
-  \end{align*}
-  \begin{align*}
-    NX^j_{i,t} = Y^j_{i,t}-E^j_{i,t},
-    \qquad
-    \sum_i NX_{i,t}=0.
-  \end{align*}
-\end{frame}
-
-\begin{frame}{Model}{Equilibrium}
-  Given parameters, $K_{i,1}$, $B_{i,1}=0$, and paths for
-  $\{\mu^j_{i,t},T^j_{i,t},\tau^j_{ih,t},\chi_{i,t},\phi_{i,t}\}$, an equilibrium
-  is paths of prices, quantities, trade shares and bonds such that
-  \begin{enumerate}\itemsep6pt
-    \item households optimize: demand, the saving equation, the law of motion;
-    \item firms minimize cost and price equals delivered cost;
-    \item prices and trade shares satisfy gravity;
-    \item goods and factor markets clear;
-    \item bonds are in zero net supply.
+\begin{frame}{Model}{Methodology}\label{fr:meth}
+  \vfill
+  \linespread{1.3}\selectfont
+  \begin{enumerate}\itemsep12pt
+    \item Invert the model and find shocks.
+    \item Given parameters, $K_{i,1}$, $B_{i,1}=0$, and paths for
+          $\{\mu^j_{i,t},T^j_{i,t},\tau^j_{ih,t},\xi_{i,t},\phi_{i,t}\}$, find
+          paths of prices, quantities, trade shares and bonds such that all
+          equilibrium conditions hold.\ap{ap:ek}
+    \item Compare results against counterfactual equilibria with fixed trade
+          costs and financial frictions.
   \end{enumerate}
+  \vfill
+\end{frame}
+\begin{frame}[fragile]{Model}{Equilibrium Conditions\ap{ap:mc}}
+  \centering
+  \tiny
+  % The table runs a shade past the frame at \tiny, so scale it rather than clip
+  % the last row.
+  \IfFileExists{tables/equilibrium_all.tex}
+    {\scalebox{0.92}{\input{tables/equilibrium_all}}}
+    {\normalsize\textit{[tables/equilibrium\_all.tex not found]}}
+\end{frame}
+%=======================================================
+\section{Recovering parameters}
+%=======================================================
+\begin{frame}{Recovering parameters}{Data}\label{fr:data}
+  \small
+  One two-country, three-sector panel, 1965--2014: the U.S.\ against an aggregated
+  rest of the world,\ap{ap:row} in agriculture, manufacturing and services.
   \vspace{6pt}
 
-\end{frame}
+  \centering \footnotesize
+  \setlength{\tabcolsep}{5pt}
+  \begin{tabular}{@{}L{3.2cm}lL{4.4cm}@{}}
+    \toprule
+    Source & Years & Contribution \\
+    \midrule
+    Long-Run WIOD, v1.1
+      & 1965--2000
+      & Input--output tables, gross output, value added, deflators \\[2pt]
+    WIOD 2016 release
+      & 2000--2014
+      & The same, at finer country and sector detail \\[2pt]
+    GGDC Productivity Level DB
+      & 2005
+      & Sectoral PPP benchmark\ap{ap:prices} \\[2pt]
+    Penn World Table 11.0
+      & 1965--2014
+      & Employment, capital, investment prices \\
+    \bottomrule
+  \end{tabular}
 
-\begin{frame}{Model}{Calibration}
+  \vspace{8pt}
+  \raggedright \small
+  \structure{\textbf{Two constructions do the work.}} The releases are chain-linked at
+  2000, levels through 2000 and growth rates after. Sectoral prices are then put in
+  common units by anchoring each country's deflator to the 2005 PPP benchmark --- which
+  is what lets trade costs and productivities be separated.
+\end{frame}
+\figframe{Recovering parameters}{Consumption Demand Shifters}{consumption_demand_shifters.pdf}
+\figframe{Recovering parameters}{Trade Costs\ap{ap:row}}{trade_costs.pdf}
+\figframe{Recovering parameters}{Productivities}{productivities.pdf}
+\figframe{Recovering parameters}{Financial Friction}{financial_friction.pdf}
+\figframe{Recovering parameters}{Investment Efficiency}{investment_efficiency.pdf}
+\begin{frame}[plain]
+  \vfill
+  \centering
+  {\usebeamercolor[fg]{structure}\Large Thank you}
+  \vfill
+\end{frame}
+%=======================================================
+\section*{Appendix}
+%=======================================================
+\begin{frame}{Appendix}{Sectoral Prices and Trade Shares (Eaton--Kortum)}\label{ap:ek}
+  \begin{itemize}\itms
+    \item \structure{\textbf{Ideal price index.}} Sectoral prices in each $j$ are given by
+      \begin{equation*}
+        P^j_{i,t} = \Gamma \left(\Phi^j_{i,t}\right)^{-\frac{1}{\theta}},
+        \quad \text{where} \quad
+        \Phi^j_{i,t} = \sum_{h \in \mathcal{I}} T^j_{h,t}
+        \left(c^j_{h,t} \tau^j_{ih,t}\right)^{-\theta}
+      \end{equation*}
+    \item \structure{\textbf{Unit cost.}} The minimum cost of the input bundle $c^j_{i,t}$ is
+      \begin{equation*}
+        c^j_{i,t} = \kappa^j_i
+        \left[ \left(r_{i,t}\right)^{\varphi_i} \left(w_{i,t}\right)^{1-\varphi_i} \right]^{\beta^j_i}
+        \left[ \prod_{k \in \mathcal{J}} \left(P^k_{i,t}\right)^{\nu^{j,k}_i} \right]^{1-\beta^j_i}
+      \end{equation*}
+    \item \structure{\textbf{Trade shares.}} Define $E^j_{i,t} \equiv P^j_{i,t} Q^j_{i,t}$ as
+      total expenditure on sector $j$. The share of expenditure on goods imported from $h$ is
+      \begin{equation*}
+        \pi^j_{ih,t} \equiv \frac{E^j_{ih,t}}{E^j_{i,t}}
+        = \frac{T^j_{h,t} \left(c^j_{h,t} \tau^j_{ih,t}\right)^{-\theta}}{\Phi^j_{i,t}}
+      \end{equation*}
+      the multisector version of the gravity equation.
+  \end{itemize}
+  \apback{fr:meth}
+\end{frame}
+\begin{frame}{Appendix}{Sectoral Price Levels: Construction}\label{ap:prices}
+  \footnotesize
+  The goal is a price for each country, sector and year that is comparable
+  \emph{across} countries, not only over time.
+  \begin{enumerate}\itemsep2pt
+    \item \structure{\textbf{Deflators.}} Gross output price indices from both WIOD releases.
+          The long-run release is in USD, so it is multiplied by the
+          \emph{2005} exchange rate to put it in local currency; the 2016
+          release is already in local currency.
+    \item \structure{\textbf{Splice.}} Chain-link at 2000 --- long-run levels through 2000,
+          2016 growth rates after --- then normalize to 2005 within each
+          country and sector, so $\tilde{\pi}_{i,c,2005}=1$.
+    \item \structure{\textbf{Benchmark.}} Take the 2005 gross-output PPP for each country
+          and sector from PLD, $\text{PPP}_{i,c}$, in local currency per USD.
+          It is a gross-output-weighted geometric mean of the product-level PPPs.
+    \item \structure{\textbf{Combine,}} holding the exchange rate at its 2005 value:
+      \begin{equation*}
+        P_{i,c,t} = \tilde{\pi}_{i,c,t}\cdot\frac{\text{PPP}_{i,c}}{e_{c,2005}}
+      \end{equation*}
+  \end{enumerate}
+  At 2005 the level is the sector's PPP relative to the United States; in every
+  other year it moves only with that country's own deflator. Fixing the exchange
+  rate keeps the nominal dollar cycle out of the cross-country comparison. For
+  the United States $\text{PPP}=e=1$, so the series is a pure within-country
+  price index.
+  \apback{fr:data}
+\end{frame}
+\begin{frame}{Appendix}{Sectoral Price Levels: Aggregating to ROW}\label{ap:row}
+  \small
+  The model has two countries, so member price levels have to be combined into
+  one. Gross-output-weighted geometric mean of the \emph{levels}, computed
+  within each year:
+  \begin{equation*}
+    \ln P_{i,\text{ROW},t}=\sum_{c\in\text{ROW}}w_{c,t}\ln P_{i,c,t},
+    \qquad
+    w_{c,t}=\frac{Y_{c,t}}{\sum_{c'\in\text{ROW}}Y_{c',t}}
+  \end{equation*}
+  \begin{itemize}\itms
+    \item A mean of levels, not a chained index of changes: a cheap member
+          lowers the ROW price level as soon as it gains share.
+    \item A chained index reads only price \emph{changes}, so an entrant
+          contributes nothing on arrival and its low level is never picked up.
+          Using one drove measured ROW services productivity negative.
+    \item Everything is aggregated to two countries first, and the disturbances
+          are recovered from the aggregated data, so no member-level parameter
+          is pooled. Bilateral trade costs follow directly from the aggregated
+          prices and trade shares,
+          $\tau^j_{ih,t}=\dfrac{P^j_{i,t}}{P^j_{h,t}}
+           \left(\dfrac{\pi^j_{hh,t}}{\pi^j_{ih,t}}\right)^{1/\theta}$.
+  \end{itemize}
+  \apback{fr:data}
+\end{frame}
+\begin{frame}{Appendix}{Market Clearing Conditions}\label{ap:mc}
+  \begin{itemize}\itms
+    \item \structure{\textbf{Goods and factor markets.}}
+      \begin{equation*}
+        C^j_{i,t} + X^j_{i,t} + \sum_{k \in \mathcal{J}} D^{k,j}_{i,t} = Q^j_{i,t}
+        \quad \text{for all } j \in \mathcal{J}
+      \end{equation*}
+      \begin{equation*}
+        \sum_{j \in \mathcal{J}} L^j_{i,t} = L_{i,t} \quad \text{and} \quad
+        \sum_{j \in \mathcal{J}} K^j_{i,t} = K_{i,t}
+      \end{equation*}
+    \item \structure{\textbf{Value of production.}} Let $Y^j_{i,t}$ denote the gross value of
+      production.
+      \begin{equation*}
+        Y^j_{i,t} = \sum_{h \in \mathcal{I}} \pi^j_{hi,t} E^j_{h,t}
+        \quad \text{for all } j \in \mathcal{J}
+      \end{equation*}
+    \item \structure{\textbf{Country resource constraint.}}
+      \begin{equation*}
+        B_{i,t+1} - R_t B_{i,t} = \sum_{j \in \mathcal{J}} Y^j_{i,t} - E^j_{i,t}
+      \end{equation*}
+    \item \structure{\textbf{International financial markets clear.}}
+      \begin{equation*}
+        \sum_{i \in \mathcal{I}} B_{i,t+1} = 0 \quad \text{for all } t
+      \end{equation*}
+  \end{itemize}
+  \apback{fr:meth}
+\end{frame}
+\begin{frame}{Appendix}{Calibration}\label{ap:cal}
   \begin{center}
-  \begin{tabular}{llc}
+  \begin{tabular}{@{}llc@{}}
     \toprule
     $\theta$   & trade elasticity              & 4 \\
     $\eta$     & elasticity across varieties   & 2 \\
@@ -249,31 +366,6 @@ baseline against counterfactual.]}
   \vspace{8pt}
   $\varepsilon^j$ from Comin, Lashkari and Mestieri (2021); $\varphi_i$ from
   Caselli and Feyrer (2007); $\beta^j_i$ and $\nu^{j,m}_i$ are sample averages.
+  \apback{fr:hh}
 \end{frame}
-
-%=======================================================
-\section{Recovering parameters}
-%=======================================================
-
-\begin{frame}{Recovering parameters}{Two steps}
-  \vfill
-  \begin{enumerate}\itemsep12pt
-    \item \textbf{Invert.} Solve the equilibrium conditions backwards for the
-          disturbances that reproduce the data exactly. 
-    \item \textbf{Freeze one disturbance and re-solve forward.} 
-          unknowns.
-  \end{enumerate}
-
-\end{frame}
-
-
-
-%=======================================================
-\section{Counterfactuals}
-%=======================================================
-
-\todoframe{Counterfactuals}{[TO ADD.]}
-
-\todoframe{Conclusion}{}{[TO ADD.]}
-
 \end{document}

@@ -1,27 +1,28 @@
 function V = variables
 
-% Variables: Names countries, sectors and slots, and assigns locations
-% Output:
-%     V     :   Structure of variable locations and names
+% variables: Names the countries and sectors and fixes their index positions.
+% Every other file refers to them through this structure, never by number.
+% Inputs:  none.
+% Output:  V (structure of names and index locations).
 
-% Countries
-V.countries = {'USA'        %1  United States
-               'ROW'        %2  Rest of world
+%---------------------------------------------
+%   1. Countries and sectors
+%---------------------------------------------
+V.countries = {'USA'         %1  United States
+               'ROW'         %2  Rest of world
                };
 V.ncty = length(V.countries);
 
-% Sectors, all tradable
-V.sectors = { 'AGR'         %1  Agriculture
-              'MAN'         %2  Manufacturing
-              'SER'         %3  Services
-              };
+V.sectors = { 'AGR'          %1  Agriculture
+              'MAN'          %2  Manufacturing
+              'SER'          %3  Services
+              };             % All three are tradable
 V.nsec = length(V.sectors);
 
-% The outcome variable
-V.outsec = 'MAN';
-V.outcty = 'USA';
-
-% Establish country and sector index
+%---------------------------------------------
+%   2. Index for each name
+%---------------------------------------------
+% So the code can say V.USA and V.MAN instead of 1 and 2.
 for i = 1:V.ncty
     V.(V.countries{i}) = i;
 end
@@ -29,11 +30,10 @@ for j = 1:V.nsec
     V.(V.sectors{j}) = j;
 end
 
-% Shocked country, and the country whose income is the numeraire
-V.ihome = V.(V.outcty);
-V.iforeign = 3 - V.ihome;
-
-% Six slots, sector major and country minor: (a,US) (a,R) (m,US) (m,R) (s,US) (s,R)
+%---------------------------------------------
+%   3. Slots for the market clearing system
+%---------------------------------------------
+% Six country-sector pairs in one vector, sector major and country minor.
 V.nslot = V.nsec*V.ncty;
 V.slot = zeros(V.nsec,V.ncty);
 for j = 1:V.nsec

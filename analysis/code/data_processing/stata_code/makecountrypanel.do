@@ -20,22 +20,34 @@ drop if year < 1965 | year > 2014
 * Split PWT into the WIOD countries and everything else.
 merge m:1 country using "../../../data/crosswalks/country_num_crosswalk.dta", keep(1 3)
 
-* Build the residual region from the non-WIOD countries: sum the quantities and
-* take GDP-weighted geometric means of the price levels.
-*
-/* NOTE: the residual region's capital jumps 137% in 1990. See the appendix. */
+* Build the residual region from the non-WIOD countries: sum the quantities
+* and take GDP-weighted geometric means of the price levels.
 preserve
 keep if _merge == 1
-bysort year: egen totw_c = total(cond(!missing(consump_pi), cgdpo, .))
-bysort year: egen totw_i = total(cond(!missing(invest_pi),  cgdpo, .))
-gen wln_consump_pi = cgdpo / totw_c * ln(consump_pi)
-gen wln_invest_pi  = cgdpo / totw_i * ln(invest_pi)
+bysort year: egen tot_w_c = total(cond(!missing(consump_pi), cgdpo, .))
+bysort year: egen tot_w_i = total(cond(!missing(invest_pi),  cgdpo, .))
+gen wln_consump_pi = cgdpo / tot_w_c * ln(consump_pi)
+gen wln_invest_pi  = cgdpo / tot_w_i * ln(invest_pi)
 
 collapse (sum) emp pop k_stock cn wln_*, by(year)
 
 gen consump_pi = exp(wln_consump_pi)
 gen invest_pi  = exp(wln_invest_pi)
 drop wln_*
+
+* The former Soviet republics enter the PWT sample only in 1990 (their capital
+* was unmeasured before then), so the residual region's stock jumps +137% in
+* one step at 1990 while investment is flat. That is a coverage change, not
+* accumulation. Chain-link it as in the appendix: hold the 1989 level across
+* 1990, then resume the observed capital growth from 1991.
+sort year
+gen kch = k_stock / k_stock[_n-1]
+gen k89 = k_stock if year == 1989
+qui su k89, meanonly
+scalar kbase = r(mean)
+replace k_stock = kbase if year == 1990     /* no jump across the seam */
+replace k_stock = k_stock[_n-1] * kch if year >= 1991
+drop kch k89
 gen country = "ROW"
 tempfile penn_row
 save `penn_row'

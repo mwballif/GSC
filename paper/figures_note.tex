@@ -27,25 +27,6 @@
 
 \section*{Recovered parameters under the two sector definitions}
 
-Every figure in this section appears twice: the baseline sector definition on
-top, and the \texttt{data\_\allowbreak processing\_\allowbreak 2} experiment
-below. The two pipelines
-read the same raw data and run the same code; they differ only in which sectors
-count as goods and whether government consumption is counted.
-
-Input--output tables are recorded at basic prices, so the wholesale and retail
-margin on a consumer good is output of the trade sector and lands in services,
-while the national accounts count the whole till price as goods. The experiment
-moves wholesale and retail trade into goods, together with hotels and
-restaurants, which the pre-2000 tables cannot separate from it, and drops
-government consumption. That moves about a third of U.S. consumption out of
-services and into manufacturing, from 75 percent services in 1965 to 41 percent,
-against 48 percent in the BEA data. The recovered parameters follow: the demand
-shifters change ordering, so manufacturing starts above services and the two
-converge rather than diverging, which is the pattern in the 2017 draft. Trade
-costs and productivities move in manufacturing and services and leave
-agriculture essentially unchanged, since nothing enters or leaves agriculture.
-
 \begin{table}[htbp]
 \centering
 \caption{U.S. consumption shares under the two definitions}
@@ -63,7 +44,7 @@ Year & Agr. & Man. & Serv. & Agr. & Man. & Serv. \\
 \end{table}
 
 \clearpage
-\pair{demand_shifters.pdf}{0.62}{Sectoral demand shifters.}
+\pair{consumption_demand_shifters.pdf}{0.62}{Sectoral consumption demand shifters.}
 
 \clearpage
 \pair{trade_costs.pdf}{0.88}{Sectoral trade costs, indexed to 1965.}
@@ -72,32 +53,40 @@ Year & Agr. & Man. & Serv. & Agr. & Man. & Serv. \\
 \pair{productivities.pdf}{0.50}{Sectoral productivities, 1965 normalized to zero.}
 
 \clearpage
-\pair{financial_friction.pdf}{0.80}{Financial friction and net foreign assets.}
+\pair{financial_friction.pdf}{0.55}{Financial friction: the effective return wedge.}
 
 \clearpage
-\pair{investment_efficiency.pdf}{0.55}{Investment-specific efficiency shifters.}
+\pair{investment_efficiency.pdf}{0.55}{The investment tax, growth rate and level.}
 
 \clearpage
-\pair{investment_shares.pdf}{0.80}{Sectoral investment shares.}
+\pair{investment_demand_shifters.pdf}{0.80}{Sectoral investment demand shifters.}
 
 \clearpage
 \section*{Counterfactual}
 
-Solved on the baseline data.
-
 \begin{figure}[htbp]
 \centering
-\includegraphics[width=\textwidth]{../analysis/code/model/results/value_added_shares.pdf}
+\includegraphics[width=\textwidth]{../analysis/results/figures/value_added_shares.pdf}
 \end{figure}
 
 \begin{figure}[htbp]
 \centering
-\includegraphics[width=0.75\textwidth]{../analysis/code/model/results/trade_imbalances.pdf}
+\includegraphics[width=0.75\textwidth]{../analysis/results/figures/trade_imbalances.pdf}
 \end{figure}
 
 \begin{figure}[htbp]
 \centering
-\includegraphics[width=0.72\textwidth]{../analysis/code/model/results/wedge.pdf}
+\includegraphics[width=\textwidth]{../analysis/code/model/results/fig_answer.pdf}
+\end{figure}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\textwidth]{../analysis/code/model/results/fig_tradecosts.pdf}
+\end{figure}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.82\textwidth]{../analysis/code/model/results/fig_imbalances.pdf}
 \end{figure}
 
 \end{document}
