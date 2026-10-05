@@ -1,23 +1,24 @@
 function B = baseline(P,V,D)
 
-% baseline: Computes what the data implies.
-% Reads value added, its uses and the final demand shares off the static
-% problem's own equations. These are the levels the solve starts from.
-% Inputs:  P (parameters), V (variable locations), D (the data).
-% Output:  B (structure of baseline series).
+%==============================================================================
+%
+%  "GSC," by Ballif and Reyes-Heroles. Algorithm in EQconditions.tex.
+%
+%  What the data implies, read off the Section 3 equations.
+%  These are the levels the hats in static.m are taken against.
+%
+%  Inputs:  P, V, D (padded)
+%  Output:  B (baseline series)
+%
+%==============================================================================
 
-%---------------------------------------------
-%   1. Value added and its uses
-%---------------------------------------------
-% Consumption is what is left of value added after investment and net exports.
+% - value added and its uses - %
+	% consumption, from the budget constraint %
 B.VA = squeeze(sum(bsxfun(@times,D.beta,D.Y),1));
 B.EC = B.VA - D.EX - D.NX;
 
-%---------------------------------------------
-%   2. Final demand shares
-%---------------------------------------------
-% The investment share is the demand system at the data. Consumption is the
-% residual use of each sector's output.
+% - final demand shares - %
+	% investment shares at the data, consumption as the residual %
 B.xs = zeros(V.nsec,V.ncty,D.T);
 B.s  = zeros(V.nsec,V.ncty,D.T);
 for t = 1:D.T
@@ -28,21 +29,29 @@ for t = 1:D.T
     end
 end
 
-% How much consumption a dollar buys, the term the consumption Euler needs.
-B.phitilde = 1./squeeze(sum(bsxfun(@times,P.eps,B.s),1));
+% - capital; X is local, only the check below uses it - %
+X   = D.K(:,2:end) - (1-P.d)*D.K(:,1:end-1);
 
-%---------------------------------------------
-%   3. Capital
-%---------------------------------------------
-B.X = D.K(:,2:end) - (1-P.d)*D.K(:,1:end-1);
+	% (note: r K = varphi VA; see static.m step 1) %
 B.r = bsxfun(@times,D.varphi,B.VA)./D.K(:,1:end-1);
 
-%---------------------------------------------
-%   4. Checks
-%---------------------------------------------
-% Shares add to one, and investment is its price times its quantity. The last
-% column is left out: no investment series stands behind it.
-B.chks = max(abs(sum(B.s,1)-1),[],'all');
-B.chkx = max(abs(sum(B.xs,1)-1),[],'all');
-tmp = abs(D.PX(:,1:end-1).*B.X(:,1:end-1)./D.EX(:,1:end-1) - 1);
+% - the price normalization, sum_i E^C_i = 1 - %
+	% B.lam takes a data level into model units, B.eUS is the model's E^C_US %
+B.lam = 1./sum(B.EC,1);
+B.eUS = B.EC(V.USA,:).*B.lam;
+
+% - bonds - %
+	% W_0 = R_0 B_0, the wealth step 2 takes as given %
+B.W0 = (D.bond0(:,1) - D.NX(:,1))*B.lam(1);
+
+% - checks, on the data years only - %
+	% data years only %
+d = 1:D.Tdata;
+B.chks = max(abs(sum(B.s(:,:,d),1)-1),[],'all');
+B.chkx = max(abs(sum(B.xs(:,:,d),1)-1),[],'all');
+tmp = abs(D.PX(:,d(1:end-1)).*X(:,d(1:end-1))./D.EX(:,d(1:end-1)) - 1);
 B.chkX = max(tmp(:));
+
+	% (note: an identity, since phi is a residual) %
+d = 1:D.Tdata-1;
+B.chkw = max(abs(1 + D.phi(:,d).*(D.bond0(:,d)-P.Bbar) - D.wedge(:,d)),[],'all');

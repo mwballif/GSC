@@ -3,7 +3,8 @@
 %
 % Purpose: Plot the recovered parameters.
 % Reads:   recovered_parameters.csv, recovered_friction.csv,
-%          recovered_invshares.csv
+%          recovered_invshares.csv, recovered_constants.csv,
+%          CountrySectorPanel_2country.csv
 % Writes:  results/figures/*.pdf
 %
 % Shared conventions, so every figure reads the same way:
@@ -32,6 +33,9 @@
 % identified, so the left panel is the ratio and the right its cumulation.
 % Figure 6: the recovered investment demand shifters mu^x (appendix eq:mux) by
 % sector, one panel per country, drawn like Figure 1.
+% Figure 7: the value added share of gross output, beta, against the single
+% constant the model holds it at. The reference line is per sector rather than
+% a single neutral value, so it carries the sector colour.
 %
 % NOTE: theta below must match recover_parameters.m.
 % NOTE: these are fundamental productivities, not measured productivity.
@@ -275,5 +279,34 @@ for i = 1:2
 end
 sgtitle(fig6, 'Evolution of Sectoral Investment Demand Shifters');
 exportgraphics(fig6, figpath + "investment_demand_shifters.pdf");
+
+%% figure 7: value added shares against the constant the model uses
+% The model takes beta as time invariant. The panel shows what it does.
+pan  = readtable(datapath + "CountrySectorPanel_2country.csv", 'TextType', 'char');
+cons = readtable(datapath + "recovered_constants.csv", 'TextType', 'char');
+yrsB = unique(pan.year);
+
+fig7 = figure('Units', 'inches', 'Position', [1 1 7 4.35], 'Color', 'w');
+for i = 1:2
+    subplot(1, 2, i); hold on; box on;
+    hb = gobjects(J, 1);
+    for j = 1:J
+        sub = sortrows(pan(strcmp(pan.country, cnames(i)) & ...
+                           strcmp(pan.sector, secs(j)), :), 'year');
+        hb(j) = plot(yrsB, sub.va_wiot ./ sub.go_wiot, '-', ...
+            'Color', col(j, :), 'LineWidth', 1.5);
+        b = cons.beta(strcmp(cons.country, cnames(i)) & ...
+                      strcmp(cons.sector, secs(j)));
+        yline(b, ':', 'Color', col(j, :), 'LineWidth', 1.5);
+    end
+    title(sprintf('%s: $\\beta^{j}_{%s}$', clabs(i), erase(cnames(i), "A")), ...
+        'Interpreter', 'latex');
+    xlabel('Year'); xlim([yrsB(1) yrsB(end)]); ylim([0.25 0.70]);
+    if i == 1
+        legend(hb, slabs, 'Location', 'southwest', 'Box', 'off');
+    end
+end
+sgtitle(fig7, 'Value Added Shares Against the Constant the Model Uses');
+exportgraphics(fig7, figpath + "value_added_shares_beta.pdf");
 
 fprintf('Figures written to %s\n', figpath);

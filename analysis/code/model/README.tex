@@ -1,0 +1,65 @@
+\documentclass[11pt]{article}
+\usepackage{geometry}
+\geometry{margin=1in}
+
+\title{\textbf{MODEL README}}
+\author{Mitchell Ballif and Ricardo Reyes-Heroles}
+\date{October 2026}
+
+\begin{document}
+
+\maketitle
+
+
+
+\section*{Programs}
+
+\begin{itemize}
+
+\item \texttt{run.m} --- solves the terminal steady state and the
+transition from 1965 onto it, once at the recovered wedges and once with a
+wedge frozen, then prints the counterfactual. Section 1, Steps 1 and 2.
+
+\item \texttt{variables.m} --- names the two regions and three sectors and
+fixes their index positions.
+
+\item \texttt{parameters.m} --- the parameters not recovered from the data,
+and the solver tolerances.
+
+\item \texttt{loaddata.m} --- reads wedges from  processed panels, 1965 to 2014. 
+
+\item \texttt{padyears.m} --- extends the sample to the steady state year
+
+\item \texttt{baseline.m} ---Baseline levels from value added data,
+consumption expenditure, and the final demand shares of Section 3.
+
+\item \texttt{wedges.m} --- Returns wedge data or create new frozen wedge path
+
+\item \texttt{static.m} --- Given a guess in wage,  static solves equilibrium conditions for a given year
+\item \texttt{steadystate.m} --- the terminal steady state, by two nested
+loops over capital and wages. Section 2.
+
+\item \texttt{dynamic.m} --- the equilibrium transition. Guesses capital and
+consumption expenditure, clears each period with \texttt{static.m}, 
+
+\item \texttt{makefigures.m} --- the figures, from
+\texttt{results/solution.mat}.
+
+\item \texttt{checknote.m} --- re-solves the path and checks it against all 26
+conditions in \texttt{EQconditions.tex}.
+
+\end{itemize}
+
+\section*{Other files}
+
+\begin{itemize}
+
+\item \texttt{EQconditions.tex} --- the model. Section 1 is the transition
+algorithm, Section 2 the steady state, Section 3 the equilibrium conditions.
+
+\item \texttt{results/solution.mat} --- everything \texttt{run.m} solved,
+rewritten on each run.
+
+\end{itemize}
+
+\end{document}

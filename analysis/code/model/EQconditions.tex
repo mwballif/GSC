@@ -1,0 +1,342 @@
+\documentclass{article}
+\usepackage{graphicx} % Required for inserting images
+\usepackage{amsmath}      % For equations
+\usepackage{amssymb}      % For mathematical symbols
+\usepackage{amsfonts}
+\usepackage[dvipsnames]{xcolor}
+\usepackage{empheq}
+\usepackage{geometry}% For mathematical fonts
+\usepackage{mathtools}
+\geometry{margin=1in}
+% Bibliography / links
+\usepackage{natbib}
+\usepackage{url}
+\usepackage[
+  bookmarks=false,
+  pdfpagelabels=false,
+  hyperindex=false,
+  pageanchor=false,
+  colorlinks=true,
+  linkcolor=red,
+  citecolor=blue,
+  pdfborder={0 0 0}
+]{hyperref}
+
+\title{GSC}
+\author{Mitchell Ballif and Ricardo Reyes-Heroles}
+\date{August 2026}
+
+\begin{document}
+
+\maketitle
+
+\section{Solving for the Equilibrium Transition of the Model (Algorithm)}
+\begin{itemize}
+    \item Let $t=0,1,2,\ldots$. {\color{blue}Assume that you know the values of all wedges for $t=0,1,\ldots,T^{W}$, and that the wedges remain unchanged after $T^{W}$}.
+    \item Fix a large period $T>>T^{W}>0$ (e.g. $T=200$) and assume that the model has reached a steady state at $T$ in which all variables remain constant.
+    \item \textbf{Step 1:} Solve for the steady state of the model in period $T$:
+    \begin{itemize}
+        \item \textbf{Algorithm:} See Section \ref{sec:SteadyState}.
+        \item \textbf{Output:} {\color{blue}$K_{i,ss},E_{i,ss}^{C},w_{i,ss}$ and $B_{i,ss} = \bar{B}_{i}$ for all $i=1,\ldots,I$.}
+    \end{itemize}
+    \item \textbf{Step 2} Solve for the transition of the model between $t=0$ and $t=T$, given $K_{i,0}$ and $W_{i,0} \equiv R_{0}B_{i,0}$ for $i \in \{US,RW\}$, such that $W_{US,0} + W_{RW,0} = 0 $:
+    \begin{enumerate}
+        \item Guess sequences $\left\{ K_{i,t}^{g}, E_{i,t}^{Cg}, w_{i,t}^{g} \right\}_{t=0}^{T}$ for $i \in \{ US, RW \}$ such that:
+        \begin{align*}
+            & K_{i,0}^{g} = K_{i,0} \text{~~~and~~~} K_{i,T}^{g} = K_{i,ss}, \\
+            & E_{i,T}^{Cg} = E_{i,ss}^{C}, \\
+            & w_{i,T}^{g} = w_{i,ss}.
+        \end{align*}
+        and construct implied guess for investment from:
+        \begin{align*}
+            X_{i,t}^{g} = K_{i,t+1}^{g} - (1-d) K_{i,t}^{g}.
+        \end{align*}
+
+        \item Use the static equilibrium conditions to obtain the rental rate for capital, $r_{i,t}$, sectoral prices, $P_{i,t}^{j}$, trade shares, $\pi_{ih,t}^{j}$, the price index for investment, $P_{i,t}^{X}$, the price index for consumption, $P_{i,t}^{C}$, sectoral consumption expenditure shares, $s_{i,t}^{j}$, Euler equation wedges, $\widetilde{\phi}_{i,t}$, and implied next exports, $\overline{NX}_{i,t}$.
+
+        \item Obtain next exports for all $t$ implied by the budget constraint:
+            \begin{align*}
+                NX_{US,t}^{g} & = w_{US,t}^{g}L_{US,t} + r_{US,t}K_{US,t}^{g} - P^X_{US,t}X_{US,t}^{g} - E_{US,t}^{Cg}, \\
+                NX_{RW,t}^{g} & = -NX_{US,t}^{g}.
+            \end{align*}
+
+        \item Construct implied sequences of $B_{US,t+1}^{g}$ and $R_{t+1}$ recursively starting at $t=0$ as follows:
+        \begin{enumerate}            
+            \item Obtain $B_{i,t+1}^{g}$ for $t$ from
+            \begin{align*}
+                B_{US,t+1}^{g} & = NX_{US,t}^{g} + R_{t}B_{US,t}^{g}, \\
+                B_{RW,t+1}^{g} & = - B_{US,t+1}^{g},
+            \end{align*}
+            where $R_{0} B_{US,0}^{g} = W_{US,0}$ for $t=0$.
+
+            \item Obtain $R_{t+1}$ for $t$ from
+            \begin{align*}
+                R_{t+1} = \frac{1}{\delta} \left[ \frac{\widetilde{\phi}_{US,t+1}}{\widetilde{\phi}_{US,t}} \frac{E_{US,t}^{Cg}}{1+\phi_{US,t} (B_{US,t+1}^{g} - \bar{B}_{US})}  + \frac{\widetilde{\phi}_{RW,t+1}}{\widetilde{\phi}_{RW,t}} \frac{\left( 1 - E_{US,t}^{Cg} \right)}{1+\phi_{RW,t} -(B_{US,t+1}^{g} - \bar{B}_{US})}  \right]^{-1}.
+            \end{align*}
+
+            \item Check equilibrium conditions:
+            \begin{align}
+                \frac{R_{t+1}}{1+\phi_{i,t}\left(B_{i,t+1}^{g}-\bar{B}_i\right)}\,P^X_{i,t} & = \frac{\chi_{i,t+1}}{\chi_{i,t}}\left[r_{i,t+1} + (1-d)P^X_{i,t+1}\right], \\
+                \frac{E_{i,t+1}^{Cg}}{E_{i,t}^{Cg}} & = \frac{\widetilde{\phi}_{i,t+1}}{\widetilde{\phi}_{i,t}} \frac{\delta R_{t+1}}{1+\phi_{i,t} (B_{i,t+1} - \bar{B}_{i})}.
+            \end{align}
+
+
+        \end{enumerate}
+
+
+        
+    \end{enumerate}
+\end{itemize}
+
+\newpage
+\section{Solving for the Steady State of the Model (Algorithm)}
+\label{sec:SteadyState}
+
+\begin{itemize}
+    \item In a steady state of the model, we have that $B_{i,ss}=\bar{B}_{i}$, and consumption expenditure is constant over time. Therefore, from the Euler equation for bonds, \eqref{eq:EEbonds}, we obtain the gross interest rate in steady state:
+    \begin{align}
+        R_{ss} = \frac{1}{\delta}.
+    \end{align}
+
+    \item Compute the steady state level of net exports:
+    \begin{align}
+        NX_{i,ss} = - (R_{ss} - 1) B_{i,ss}.
+    \end{align}
+
+    \item Compute the steady state levels of capital, $K_{i,ss}$, and wages, $w_{i,ss}$, by following these steps:
+    \begin{itemize}
+        \item \textbf{Step 1: (start of outer loop)} Guess a level of capital stocks, $K_{i,ss}$.
+        \item \textbf{Step 2: (start of inner loop)} Guess wages, $w_{i,ss}$.
+        \begin{enumerate}
+            \item Compute the rental rate of capital, $r_{i,ss}$, from \eqref{eq:KLratio}.
+            \item Compute sectoral prices, $P_{i,ss}^{j}$, by solving \eqref{eq:UnitCosts} and \eqref{eq:SecPrices} simultaneously.
+            \item Compute sectoral trade shares, $\pi_{ih,ss}^{j}$, from \eqref{eq:piShares}.
+            \item Compute the price of investment, $P_{i,ss}^{X}$, from \eqref{eq:PriceX}.
+            \item Compute the steady state level of investment: $X_{i,ss} = d K_{i,ss}$.
+            \item Compute the steady state level of consumption expenditure:
+            \begin{align*}
+                E_{i,ss}^{C} = w_{i,ss}L_{i,T} + r_{i,ss}K_{i,ss} - P^X_{i,ss}X_{i,ss} - NX_{i,ss}.
+            \end{align*}
+            \item Compute the price of consumption, $P_{i,ss}^{C}$, and level of consumption, $C_{i,ss}$, by solving \eqref{eq:PriceC} and \eqref{eq:AggC} simultaneously.
+            \item Compute sectoral levels of consumption expenditure, $E_{i,ss}^{C,j}$, from \eqref{eq:SharesC} and of investment expenditure, $E_{i,ss}^{X,j}$, from \eqref{eq:SharesX}.
+            \item Solve for sectoral levels of expenditure, $E_{i,ss}^{j}$, and output, $Y_{i,ss}^{j}$, by solving the system of equations determined by \eqref{eq:MCExp} and \eqref{eq:MCOut}.
+            \item Compute $\overline{NX}_{i,ss}$ from \eqref{eq:NXTrade}.
+        \end{enumerate}
+        \item \textbf{Step 3: (end of inner loop)} Define the error for the inner loop as $\varepsilon^{w} =  NX_{US,ss} - \overline{NX}_{US,ss}$.
+        \begin{itemize}
+            \item If $\vert \varepsilon^{w} \rvert>tol$ where $tol$ is a small number which determines our tolerance on the error (e.g. $10^{-6}$), then compute an update for wages, $w_{i,ss}^{up}$, as follows and go back to \textbf{Step 2} with the new guess for wages given by the update:
+            \begin{align*}
+                \begin{bmatrix}
+                    w_{US,ss}^{up} \\ w_{RW,ss}^{up} 
+                \end{bmatrix}
+                =
+                \begin{bmatrix}
+                    w_{US,ss}(1-\varepsilon^{w}) \\ w_{RW,ss}(1+\varepsilon^{w}) 
+                \end{bmatrix}.
+            \end{align*}
+            \item If $\vert \varepsilon^{w} \rvert<tol$, then proceed to \textbf{Step 4}.
+        \end{itemize}
+        \item \textbf{Step 4: (end of outer loop)} Define the error for the outer loop as
+        \begin{align*}
+            \varepsilon_{i}^{K} = \frac{1}{\delta} - \left( \frac{r_{i,ss}}{P_{i,ss}^{X}} + (1-d) \right).
+        \end{align*}
+        \begin{itemize}
+            \item If $\varepsilon_{i}^{K}>0$, then guess of capital is too high.
+            \item If $\varepsilon_{i}^{K}<0$, then guess of capital is too low.
+        \end{itemize}
+    \end{itemize}
+\end{itemize}
+
+\newpage
+\section{Equilibrium Conditions}
+\label{sec:EqConditions}
+
+\begin{itemize}
+    \item Consider the sequence of budget constraints (already accounting for the governments balanced budget):
+    \begin{align*}
+        E^C_{i,t} + P^X_{i,t}X_{i,t} + B_{i,t+1} = w_{i,t}L_{i,t} + r_{i,t}K_{i,t} + R_{i,t}B_{i,t}.
+    \end{align*}
+    
+\end{itemize}
+
+\subsection{Static Equilibrium Conditions}
+
+\begin{itemize}
+    \item \textbf{Suppose that in any given period $t$ you know the value of the endogenous variables {\color{red}$K_{i,t},X_{i,t}$} and {\color{red}$E_{i,t}^{C}$} (in addition to the value of all the wedges). Then:} 
+\end{itemize}
+
+\begin{itemize}
+    \item Wage - rental rate ratio:
+    \begin{align}
+        \boxed{\frac{w_{i,t} L_{i,t}}{r_{i,t} {\color{red}K_{i,t}}} = \frac{\varphi_{i}}{1-\varphi_{i}}.}
+        \label{eq:KLratio}
+    \end{align}
+\end{itemize}
+
+\begin{itemize}
+    \item Unit costs:
+    \begin{align}
+        \boxed{c_{i,t}^{j} = \kappa^j_i \left[\left(\left(r_{i,t}\right)^{\varphi_i}\left(w_{i,t}\right)^{1-\varphi_i}\right)^{\beta^j_i}
+      \left(\prod_{k\in\mathcal{J}}\left(P^k_{i,t}\right)^{\nu^{j,k}_i}\right)^{1-\beta^j_i}\right],}
+      \label{eq:UnitCosts}
+    \end{align}
+    where
+    \begin{align*}
+        \kappa^j_i \equiv \left[\varphi_i^{\varphi_i}(1-\varphi_i)^{1-\varphi_i}\right]^{-\beta^j_i} \left(\beta^j_i\right)^{-\beta^j_i}
+      \left(1-\beta^j_i\right)^{-(1-\beta^j_i)} \prod_{m\in\mathcal{J}}\left(\nu^{j,m}_i\right)^{-(1-\beta^j_i)\nu^{j,m}_i}.
+    \end{align*}
+\end{itemize}
+
+\begin{itemize}
+    \item Sectoral prices:
+    \begin{itemize}
+        \item Solve system of equations with 6 ($2\times3$) unknowns and 6 ($2\times3$) equations:
+    \end{itemize}
+    \begin{align}
+        \boxed{P^j_{i,t} = \Gamma \left[ \sum_{h=1}^{I} T_{h,t}^{j} (c_{h,t}^{j} \tau_{ih,t}^{j})^{-\theta} \right]^{-\frac{1}{\theta}},}
+        \label{eq:SecPrices}
+    \end{align}
+    obtained from 
+    \begin{align*}
+        P^j_{i,t} = \Gamma \left[ \Phi_{i,t}^{j} \right]^{-\frac{1}{\theta}}\text{~~~and~~~}\Phi_{i,t}^{j} = \sum_{h=1}^{I} T_{h,t}^{j} (c_{h,t}^{j} \tau_{ih,t}^{j})^{-\theta}.
+    \end{align*}
+\end{itemize}
+
+\begin{itemize}
+    \item Trade shares:
+    \begin{align}
+        \boxed{\pi_{ih,t}^{j} = \frac{T_{h,t}^{j}(c_{h,t}^{j} \tau_{ih,t}^{j})^{-\theta}}{\Phi_{i,t}^{j}}.}
+        \label{eq:piShares}
+    \end{align}
+\end{itemize}
+
+\begin{itemize}
+    \item Price of investment:
+    \begin{align}
+        \boxed{P^X_{i,t} \equiv \left[\sum_{j\in\mathcal{J}} \mu^{x,j}_{i,t} \left(P^j_{i,t}\right)^{1-\zeta}\right]^{\frac{1}{1-\zeta}}.}
+        \label{eq:PriceX}
+    \end{align}
+\end{itemize}
+
+\begin{itemize}
+    \item Price of consumption and aggregate consumption:
+    \begin{itemize}
+        \item Solve two systems of equations with 2 unknowns and 2 equations each:
+    \end{itemize}
+    \begin{empheq}[box=\fbox]{align}
+        P^C_{i,t} & = \left[ \sum_{j \in \mathcal{J}} \left( \mu^{c,j}_{i,t} \right) \left(\frac{C_{i,t}}{L_{i,t}}\right)^{ (1-\psi) (\varepsilon^j - 1)} \left( P^j_{i,t} \right)^{1-\psi} \right]^{\frac{1}{1-\psi}}, \label{eq:PriceC} \\
+        C_{i,t} & = \frac{{\color{red}E_{i,t}^{C}}}{P_{i,t}^{C}}. \label{eq:AggC} 
+    \end{empheq}
+\end{itemize}
+
+\begin{itemize}
+    \item Sectoral consumption expenditure:
+    \begin{align}
+        \boxed{E_{i,t}^{C,j} = s_{i,t}^{j} {\color{red}E_{i,t}^{C}},}
+        \label{eq:SharesC}
+    \end{align}
+    where
+    \begin{align*}
+        s^j_{i,t} & = \mu^{c,j}_{i,t} \left(\frac{P^j_{i,t}}{P^C_{i,t}}\right)^{1-\psi} \left(\frac{C_{i,t}}{L_{i,t}}\right)^{(1-\psi)(\varepsilon^j -1)}.
+    \end{align*}
+\end{itemize}
+
+\begin{itemize}
+    \item Sectoral investment expenditure:
+    \begin{align}
+        \boxed{E_{i,t}^{X,j} = x_{i,t}^{j} E_{i,t}^{X},}
+        \label{eq:SharesX}
+    \end{align}
+    where
+    \begin{align*}
+        x^j_{i,t} & = \mu^{x,j}_{i,t}\left(\frac{P^j_{i,t}}{P^X_{i,t}}\right)^{1-\zeta}, \\
+        E_{i,t}^{X} & = P_{i,t}^{X} \left( {\color{red}K_{i,t+1}} - (1-d) {\color{red}K_{i,t}}\right).
+    \end{align*}
+\end{itemize}
+
+% \begin{itemize}
+%     \item Sectoral investment expenditure:
+%     \begin{align}
+%         \boxed{E_{i,t}^{X,j} = x_{i,t}^{j} E_{i,t}^{X},}
+%     \end{align}
+%     where
+%     \begin{align*}
+%         x^j_{i,t} = \mu^{x,j}_{i,t}\left(\frac{P^j_{i,t}}{P^X_{i,t}}\right)^{1-\zeta}.
+%     \end{align*}
+% \end{itemize}
+
+\begin{itemize}
+    \item Sectoral expenditures and value of output:
+    \begin{itemize}
+        \item Solve system of linear equations with 12 equations and 12 unknowns:
+    \end{itemize}
+    \begin{empheq}[box=\fbox]{align}
+        %E_{i,t}^{j} & = E_{i,t}^{C,j} + E_{i,t}^{X,j} + \sum_{k=1}^{J} E_{i,t}^{M,kj}, \\
+        E_{i,t}^{j} & = E_{i,t}^{C,j} + E_{i,t}^{X,j} + \sum_{k=1}^{J} \left( 1-\beta_{i}^{j} \right) \nu_{i}^{kj} Y_{i,t}^{k}, \label{eq:MCExp} \\
+        Y_{i,t}^{j} & = \sum_{h} \pi_{hi,t}^{j} E_{i,t}^j. \label{eq:MCOut}%\\
+        %E_{i,t}^{M,kj} & = \left( 1-\beta_{i}^{j} \right) \nu_{i}^{kj} Y_{i,t}^{k}
+    \end{empheq}
+\end{itemize}
+
+\begin{itemize}
+    \item Aggregate net exports in line with static trade flows:
+    \begin{align}
+        \boxed{\overline{NX}_{i,t} = \sum_{j=1}^{J} NX_{i,t}^{j} = \sum_{j=1}^{J} \left( Y_{i,t}^{j} - E_{i,t}^{j} \right).}
+        \label{eq:NXTrade}
+    \end{align}
+\end{itemize}
+
+\begin{itemize}
+    \item Aggregate net exports in line with budget constraint:
+    \begin{align}
+        NX_{i,t} = \left( w_{i,t}L_{i,t} + r_{i,t}{\color{red}K_{i,t}} \right) - \left( {\color{red}E^C_{i,t}} + P^X_{i,t} \left( {\color{red}K_{i,t+1}} - (1-d) {\color{red}K_{i,t}}\right) \right)
+    \end{align}
+\end{itemize}
+
+\begin{itemize}
+    \item \textbf{In a static equilibrium (like the steady state), one would have to iterate on the guess for wages until}
+    \begin{align}
+        \overline{NX}_{i,t} = NX_{i,t}.
+    \end{align}
+\end{itemize}
+
+\subsection{Dynamic Equilibrium Conditions}
+
+\begin{itemize}
+    \item In a full equilibrium of the model:
+    \begin{align}
+        \frac{E_{i,t+1}^{C}}{E_{i,t}^{C}} = \frac{\widetilde{\phi}_{i,t+1}}{\widetilde{\phi}_{i,t}} \frac{\delta R_{t+1}}{1+\phi_{i,t} (B_{i,t+1} - \bar{B}_{i})}.
+        \label{eq:EEbonds}
+    \end{align}
+
+    \item We choose to normalize prices in period $t$ such that:
+    \begin{align*}
+        \sum_{i}^{I} E_{i,t}^{C} = 1.
+    \end{align*}
+
+    \item Suppose that you guess $\{ E_{US,t}^{C} \}_{t=0}^{\infty}$. Note that, given our price normalization, the following two conditions must hold in every period $t$:
+    \begin{align*}
+        E_{US,t+1}^{C} & = \frac{\widetilde{\phi}_{US,t+1}}{\widetilde{\phi}_{US,t}} \frac{\delta R_{t+1}}{1+\phi_{US,t} (B_{US,t+1} - \bar{B}_{US})} E_{US,t}^{C}, \\
+        1 - E_{US,t+1}^{C} & = \frac{\widetilde{\phi}_{RW,t+1}}{\widetilde{\phi}_{RW,t}} \frac{\delta R_{t+1}}{1+\phi_{RW,t} -(B_{US,t+1} - \bar{B}_{US})} \left( 1 - E_{US,t}^{C} \right).
+    \end{align*}
+    Adding these two conditions we see that the equilibrium interest rate must satisfy:
+    \begin{align}
+        %1 = \frac{\widetilde{\phi}_{US,t+1}}{\widetilde{\phi}_{US,t}} \frac{\delta R_{t}}{1+\phi_{US,t} (B_{US,t+1} - \bar{B}_{US})} E_{US,t}^{C} + \frac{\widetilde{\phi}_{RW,t+1}}{\widetilde{\phi}_{RW,t}} \frac{\delta R_{t}}{1+\phi_{RW,t} -(B_{US,t+1} - \bar{B}_{US})} \left( 1 - E_{US,t}^{C} \right)
+        R_{t+1} = \frac{1}{\delta} \left[ \frac{\widetilde{\phi}_{US,t+1}}{\widetilde{\phi}_{US,t}} \frac{E_{US,t}^{C}}{1+\phi_{US,t} (B_{US,t+1} - \bar{B}_{US})}  + \frac{\widetilde{\phi}_{RW,t+1}}{\widetilde{\phi}_{RW,t}} \frac{\left( 1 - E_{US,t}^{C} \right)}{1+\phi_{RW,t} -(B_{US,t+1} - \bar{B}_{US})}  \right]^{-1}
+    \end{align}
+
+    \item Given the guess for wages in every period, we obtain $\{ NX_{t}\}_{t=0}^{\infty}$. Then, given $W_{US,0} \equiv R_{0} B_{US,0}$, we can construct $\{ B_{i,t+1} \}_{t=0}^{\infty}$ recursively as follows:
+    \begin{align}
+        B_{US,t+1} = NX_{US,t} + R_{t} B_{i,t}.
+    \end{align}
+
+    \item We obtain the sequence of equilibrium interest rates $\{ R_{t} \}_{t=0}^{\infty}$.
+
+
+    \item The final equilibrium condition to be satisfied is:
+    \begin{align}
+         \frac{R_{t+1}}{1+\phi_{i,t}\left(B_{i,t+1}-\bar{B}_i\right)}\,P^X_{i,t}  = \frac{\chi_{i,t+1}}{\chi_{i,t}}\left[r_{i,t+1} + (1-d)P^X_{i,t+1}\right].
+    \end{align}
+\end{itemize}
+
+\end{document}

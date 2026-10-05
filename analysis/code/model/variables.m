@@ -1,13 +1,18 @@
 function V = variables
 
-% variables: Names the countries and sectors and fixes their index positions.
-% Every other file refers to them through this structure, never by number.
-% Inputs:  none.
-% Output:  V (structure of names and index locations).
+%==============================================================================
+%
+%  "GSC," by Ballif and Reyes-Heroles. Algorithm in EQconditions.tex.
+%
+%  Names the countries and sectors and fixes their index positions.
+%  Every other file refers to them by name, never by number.
+%
+%  Inputs:  none
+%  Output:  V
+%
+%==============================================================================
 
-%---------------------------------------------
-%   1. Countries and sectors
-%---------------------------------------------
+% - countries and sectors - %
 V.countries = {'USA'         %1  United States
                'ROW'         %2  Rest of world
                };
@@ -19,10 +24,7 @@ V.sectors = { 'AGR'          %1  Agriculture
               };             % All three are tradable
 V.nsec = length(V.sectors);
 
-%---------------------------------------------
-%   2. Index for each name
-%---------------------------------------------
-% So the code can say V.USA and V.MAN instead of 1 and 2.
+% - index for each name, so the code says V.USA and V.MAN, not 1 and 2 - %
 for i = 1:V.ncty
     V.(V.countries{i}) = i;
 end
@@ -30,10 +32,8 @@ for j = 1:V.nsec
     V.(V.sectors{j}) = j;
 end
 
-%---------------------------------------------
-%   3. Slots for the market clearing system
-%---------------------------------------------
-% Six country-sector pairs in one vector, sector major and country minor.
+% - slots for the market clearing system, step 9 of static.m - %
+	% country-sector pairs in one vector, sector major %
 V.nslot = V.nsec*V.ncty;
 V.slot = zeros(V.nsec,V.ncty);
 for j = 1:V.nsec
